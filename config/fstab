@@ -1,0 +1,18 @@
+################ Use this file as a reference point for setting up points for your fstab.#################
+# Don't copy this file to your fstab, your drive's UUID will not match mine and therefore you will fail to boot.
+# As you can see, we have added defaults, commit=60 , noatime, noauto, x-systemd.automount for the home partition. You can find more about this on the arch wiki.
+# And we have added discard because it increases swap performance. (probably?)
+
+# Static information about the filesystems.
+# See fstab(5) for details.
+
+# <file system> <dir> <type> <options> <dump> <pass>
+# /dev/sda1
+#UUID=	/         	ext4      	rw,noatime	0 1
+
+# /dev/sda6
+UUID=5dfd59cf-d25c-4593-930e-7de9d36d31ae	/home     	ext4      	rw,defaults,commit=60,noatime,noauto,x-systemd.automount	0 2
+
+# /dev/sda3
+UUID=0f707fa9-340d-4580-b40f-e2bd567eb4eb	none      	swap      	defaults,discard  	0 0
+

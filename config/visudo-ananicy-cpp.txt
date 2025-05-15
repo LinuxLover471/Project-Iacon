@@ -1,0 +1,1 @@
+ak ALL=(ALL) NOPASSWD: /bin/systemctl, /usr/bin/systemctl
