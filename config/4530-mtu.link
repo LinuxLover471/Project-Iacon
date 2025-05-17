@@ -1,6 +1,0 @@
-[Match]
-Type=wlan
-
-[Link]
-MTUBytes=1372
-TransmitQueueLength=2000

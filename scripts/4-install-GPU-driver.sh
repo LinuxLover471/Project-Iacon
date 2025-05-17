@@ -32,6 +32,10 @@ if [[ "$gpu_drv" == "nvidia" ]]; then
 elif [[ "$gpu_drv" == "amd" ]]; then
     echo "Installing mesa and lib32-mesa."
     sudo pacman -S --needed --noconfirm "$gpu_pkg"
+    echo "Copying mkinitcpio for faster boot times."
+    sudo cp -av "$dir"/config/mkinitcpio-other-gpu.conf /etc/mkinitcpio.conf
+    echo "Updating initramfs."
+    sudo mkinitcpio -P
     if [[ "$vulkansupport" == "yes" || "$vulkansupport" == "y" ]]; then
         sudo pacman -S --noconfirm --needed vulkan-radeon lib32-vulkan-radeon
     else
@@ -43,6 +47,10 @@ elif [[ "$gpu_drv" == "amd" ]]; then
 elif [[ "$gpu_drv" == "intel" ]]; then
     echo "Installing mesa and lib32-mesa."
     sudo pacman -S --needed --noconfirm "$gpu_pkg"
+    echo "Copying mkinitcpio for faster boot times."
+    sudo cp -av "$dir"/config/mkinitcpio-other-gpu.conf /etc/mkinitcpio.conf
+    echo "Updating initramfs."
+    sudo mkinitcpio -P
     if [[ "$vulkansupport" == "yes" || "$vulkansupport" == "y" ]]; then
         sudo pacman -S --noconfirm --needed vulkan-intel lib32-vulkan-intel
     else
