@@ -4,22 +4,22 @@
 if [[ "$gpu_drv" == "nvidia" ]]; then
     if [[ "$nvidia_version" == "nvidia" ]]; then
         echo "Installing default nvidia driver and it's components."
-        sudo pacman -S --noconfirm --needed nvidia nvidia-utils lib32-nvidia-utils libxnvctrl
-        "$aur_hlp" --noconfirm lib32-libxnvctrl
+        sudo pacman -S --noconfirm --needed "$gpu_pkg"
+        "$aur_hlp" -S --noconfirm lib32-libxnvctrl
     elif [[ "$nvidia_version" == "nvidia-open" ]]; then
         echo "Installing nvidia-open driver and it's components."
-        sudo pacman -S --noconfirm --needed nvidia-open nvidia-utils lib32-nvidia-utils libxnvctrl
-        "$aur_hlp" --noconfirm lib32-libxnvctrl
+        sudo pacman -S --noconfirm --needed "$gpu_pkg"
+        "$aur_hlp" -S --noconfirm lib32-libxnvctrl
     elif [[ "$nvidia_version" == "nvidia-dkms" ]]; then
         echo "Installing nvidia-dkms driver and it's components."
-        sudo pacman -S --noconfirm --needed nvidia-dkms nvidia-utils lib32-nvidia-utils libxnvctrl
-        "$aur_hlp" --noconfirm lib32-libxnvctrl
+        sudo pacman -S --noconfirm --needed "$gpu_pkg"
+        "$aur_hlp" -S --noconfirm lib32-libxnvctrl
     elif [[ "$nvidia_version" == "470xx" ]]; then
         echo "Installing 470xx nvidia driver and it's components."
-        "$aur_hlp" -S --noconfirm nvidia-470xx-dkms nvidia-470xx-utils lib32-nvidia-470xx-utils nvidia-470xx-settings libxnvctrl-470xx lib32-libxnvctrl-470xx
+        "$aur_hlp" -S --noconfirm "$gpu_pkg"
     elif [[ "$nvidia_version" == "390xx" ]]; then
         echo "Installing 390xx nvidia driver and it's components."
-        "$aur_hlp" -S --noconfirm nvidia-390xx-dkms nvidia-390xx-utils lib32-nvidia-390xx-utils nvidia-390xx-settings libxnvctrl-390xx lib32-libxnvctrl-390xx
+        "$aur_hlp" -S --noconfirm "$gpu_pkg"
     fi
 
     echo "Copying mkinitcpio configuration to setup up the driver and get better boot times."
@@ -31,7 +31,7 @@ if [[ "$gpu_drv" == "nvidia" ]]; then
 
 elif [[ "$gpu_drv" == "amd" ]]; then
     echo "Installing mesa and lib32-mesa."
-    sudo pacman -S --needed --noconfirm mesa lib32-mesa
+    sudo pacman -S --needed --noconfirm "$gpu_pkg"
     if [[ "$vulkansupport" == "yes" || "$vulkansupport" == "y" ]]; then
         sudo pacman -S --noconfirm --needed vulkan-radeon lib32-vulkan-radeon
     else
@@ -42,7 +42,7 @@ elif [[ "$gpu_drv" == "amd" ]]; then
 
 elif [[ "$gpu_drv" == "intel" ]]; then
     echo "Installing mesa and lib32-mesa."
-    sudo pacman -S --needed --noconfirm mesa lib32-mesa
+    sudo pacman -S --needed --noconfirm "$gpu_pkg"
     if [[ "$vulkansupport" == "yes" || "$vulkansupport" == "y" ]]; then
         sudo pacman -S --noconfirm --needed vulkan-intel lib32-vulkan-intel
     else

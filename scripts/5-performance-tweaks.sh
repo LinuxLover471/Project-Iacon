@@ -1,8 +1,9 @@
 #!/bin/bash
-# Getting filesystem types for root and home partitions
+# Getting filesystem block names for root and home partitions
 root_dev=$(findmnt -n -o SOURCE /)
 home_dev=$(findmnt -n -o SOURCE /home | grep '^/dev/')
-
+# Find if the user uses RAID or not.
+swapdev=$(swapon --show=NAME --noheadings)
 
 # Backup fstab in case the system gets screwed.
 sudo cp /etc/fstab /etc/fstab.bak
@@ -18,18 +19,25 @@ else
     echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
 fi
 
-# Build new fstab
-# Comment out the root (/) line
+# Modify the old fstab.
+# Comment out the root (/) line to make sure the rw options in the bootloader kernel parameters work.
+echo "Removing # before root partition to ensure kernel parameters have any effect."
 sudo sed -i '/\s\/\s/s/^/#/' /etc/fstab
 
 # Modify /home mount options
-sudo sed -i '/\s\/home\s/s|ext4\s\+\S\+|ext4\t\trw,defaults,commit=60,noatime,noauto,x-systemd.automount|' /etc/fstab
+echo "Adding parameters for home partition."
+sudo sed -i '/\s\/home\s/s|ext4\s\+\S\+|ext4\t\trw,defaults,commit=60,relatime,noauto,x-systemd.automount|' /etc/fstab
 
-# Modify swap options if present
-sudo sed -i '/\sswap\s/s|swap\s\+\S\+|swap\t\tdefaults,discard|' /etc/fstab
+# Modify swap options if present and handle RAID and no swap partition.
+if [[ $swapdev == /dev/md* ]]; then
+    echo "Warning: swap is on RAID device $swapdev. Enabling discard on swap can cause system lockups."
+elif [[ "$swapdev" == "" ]]; then
+    echo "No swap partition found."
+else
+    echo "Adding discard to swap."
+    sudo sed -i '/\sswap\s/s|swap\s\+\S\+|swap\t\tdefaults,discard|' /etc/fstab
+fi
 
-echo "Masking systemd-fsck-root service to stop interfering with fstab."
-sudo systemctl mask systemd-fsck-root
 
 echo "Enabling fast_commit."
 sudo tune2fs -O fast_commit "$root_dev"
@@ -37,9 +45,6 @@ sudo tune2fs -O fast_commit "$home_dev"
 
 echo "Copying I/O Scheduler rules."
 sudo cp -av "$dir"/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
-
-echo "Triggering udevadm to apply I/O Scheduler changes."
-sudo udevadm trigger
 
 echo "Copying vm.swappiness configuration."
 sudo cp -av "$dir"/99-swappiness.conf /etc/sysctl.d/99-swappiness.conf

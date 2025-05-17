@@ -4,66 +4,61 @@ dir="$(dirname "$(readlink -f "$0")")" # Finds the current directory from which 
 
 # Asking which kernel version the user is using to make sure the right headers are used.
 
-echo "Hi, this script is made to assist users in installing and setting up their system with the arch wiki performance tweaks. You NEED to have ext4 root and home partition. ANY damage caused to your hardware or data is not my fault and it's your responsibility. If you continue, I will consider any damage your responsibility."
+echo "Hi, this script is made to assist users in installing and setting up their system with the arch wiki performance tweaks. You NEED to have ext4 root and home partition for the performance tweaks. ANY damage caused to your hardware or data is not my fault and it's your responsibility. If you continue, I will consider any damage your responsibility."
 echo ""
-while true; do
-    read -rp "Which kernel are you using? Default is option 1 just press enter. [1=Normal] 2=Zen 3=LTS 4=RT 5=RT-LTS 6=Hardened. 7=None (Custom kernel)" linux_choice
-    linux_choice="${linux_choice,,}"
-    if [[ "$linux_choice" == "1" || "$linux_choice" == "" ]]; then
-        linux_header="linux-headers"
-        break
-    elif [[ "$linux_choice" == "2" ]]; then
-        linux_header="linux-zen-headers"
-        break
-    elif [[ "$linux_choice" == "3" ]]; then
-        linux_header="linux-lts-headers"
-        break
-    elif [[ "$linux_choice" == "4" ]]; then
-        linux_header="linux-rt-headers"
-        break
-    elif [[ "$linux_choice" == "5" ]]; then
-        linux_header="linux-rt-lts-headers"
-        break
-    elif [[ "$linux_choice" == "6" ]]; then
-        linux_header="linux-hardened-headers"
-        break
-    elif [[ "$linux_choice" == "7" ]]; then
-        linux_header=""
-        break
-    else
-        echo "Please provide a valid input or else."
-    fi
-done
+
+kernel_header=$(uname -r)
+if [[ "$kernel_header" == *"rt-lts"* ]]; then
+    linux_header="linux-rt-lts-headers"
+elif [[ "$kernel_header" == *"rt"* ]]; then
+    linux_header="linux-rt-headers"
+elif [[ "$kernel_header" == *"lts"* ]]; then
+    linux_header="linux-lts-headers"
+elif [[ "$kernel_header" == *"zen"* ]]; then
+    linux_header="linux-zen-headers"
+elif [[ "$kernel_header" == *"hardened"* ]]; then
+    linux_header="linux-hardened-headers"
+elif [[ "$kernel_header" == *"arch"* ]]; then
+    linux_header="linux-headers"
+else
+    echo "Failed to find the correct linux headers, probably using a custom kernel."
+    linux_header=""
+fi
 
 # Asking about installing gamemode or ananicy-cpp.
 
-while true; do
-    read -rp "Do you want to install/use ananicy-cpp or gamemode? [1]=ananicy-cpp and [2]=gamemode." ananicyornot
-    ananicyornot="${ananicyornot,,}"
-    if [[ "$ananicyornot" == "1" ]]; then
-        echo "Setting to install ananicy-cpp."
-        ananicycpporgamemode="ananicy-cpp"
-        break
-    elif [[ "$ananicyornot" == "2" ]]; then
-        echo "Setting to install gamemode."
-        ananicycpporgamemode="gamemode lib32-gamemode"
-        break
-    else
-        echo "Please provide a valid input."
-    fi
+echo "Do you want to install ananicy-cpp or gamemode?"
+select ananicyornot in "ananicy-cpp" "gamemode"; do
+    case $ananicyornot in
+        "ananicy-cpp")
+            echo "Setting to install ananicy-cpp..."
+            ananicycpporgamemode="ananicy-cpp"
+            break
+            ;;
+        "gamemode")
+            echo "Setting to install gamemode..."
+            ananicycpporgamemode="gamemode lib32-gamemode"
+            break
+            ;;
+        *)
+            echo "Please provide a valid input. 1 or 2."
+            ;;
+    esac
 done
+
 
 # Asking about installing necessary vulkan support.
 
 while true; do
-    read -rp "Do you want vulkan support? It installs the vulkan-icd-loader and it's lib32. [Y/n] " vulkansupport
+    read -n1 -rp " [Y/n] " vulkansupport
     vulkansupport="${vulkansupport,,}"
-    if [[ "$vulkansupport" == "" || "$vulkansupport" == "yes" || "$vulkansupport" == "y" ]]; then
-        echo "Setting to install vulkan support."
+    echo
+    if [[ -z "$vulkansupport" || "$vulkansupport" == "y" ]]; then
+        echo "Setting to install vulkan support..."
         vulkan_pkg="vulkan-icd-loader lib32-vulkan-icd-loader"
         break
-    elif [[ "$vulkansupport" == "no" || "$vulkansupport" == "n" ]]; then
-        echo "Vulkan support will NOT be installed."
+    elif [[ "$vulkansupport" == "n" ]]; then
+        echo "Vulkan support will NOT be installed..."
         vulkan_pkg=""
         break
     else
@@ -73,15 +68,17 @@ done
 
 # Asking about the username and asking about creating a new user.
 
-read -rp "What do you [want to/have named] your user?" user
 while true; do
-    read -rp "Do you want to create a new (w/root privileges) user? (Required for non-root access for trizen and aur.) [Y/n]" user_choice
+    read -n1 -rp "Do you want to create a new (w/root privileges) user? (Required for non-root access for trizen and aur.) [Y/n]" user_choice
     user_choice="${user_choice,,}"
-    if [[ "$user_choice" == "" || "$user_choice" == "yes" || "$user_choice" == "y" ]]; then
-        echo "The script will be continuing with (yes)."
+    echo
+    if [[ -z "$user_choice" || "$user_choice" == "y" ]]; then
+        echo "The script will be continuing with (yes)..."
+        read -rp "What do you want to name your user?" user
         break
-    elif [[ "$user_choice" == "no" || "$user_choice" == "n" ]]; then
+    elif [[ "$user_choice" == "n" ]]; then
         echo "The script will be continuing with (no)."
+        user=$(whoami)
         break
     else
         echo "Please provide a valid input."
@@ -90,13 +87,14 @@ done
 
 # Asking about installing trizen or not.
 while true; do
-    read -rp "Do you want to install trizen? (It's important for installing graphics drivers.) Also if you use something else like aurutils or not a pacman wrapper, the aur packages installation may (most likely will) fail. [Y/n] :"  trizen_choice
+    read -n1 -rp "Do you want to install trizen? (It's important for installing some older nvidia graphics drivers.) Also if you use something else like aurutils or not a pacman wrapper, the aur packages installation may (most likely will) fail. [Y/n] :"  trizen_choice
     trizen_choice="${trizen_choice,,}"
-    if [[ "$trizen_choice" == "" || "$trizen_choice" == "yes" || "$trizen_choice" == "y" ]];then
-        echo "Setting to install and use trizen."
+    echo
+    if [[ -z "$trizen_choice" || "$trizen_choice" == "y" ]];then
+        echo "Setting to install and use trizen..."
         aur_hlp=trizen
         break
-    elif [[ "$trizen_choice" == "no" || "$trizen_choice" == "n" ]]; then
+    elif [[ "$trizen_choice" == "n" ]]; then
         read -rp "What is the aur helper that you use?" aur_hlp
         break
     else
@@ -107,25 +105,55 @@ done
 # Asking the user about which GPU driver to install.
 
 while true; do
-    read -rp "Do you want to install a GPU driver? [Y/n] :" gpu_choice
+    read -n1 -rp "Do you want to install a GPU driver? [Y/n] :" gpu_choice
     gpu_choice="${gpu_choice,,}"
-    if [[ "$gpu_choice" == "" || "$gpu_choice" == "yes" || "$gpu_choice" == "y" ]];then
-        read -rp "Which gpu driver do you want to install then? [nvidia/amd/intel] (Type the exact name! capitalization is allowed and nothing else.)" gpu_drv
-        gpu_drv="${gpu_drv,,}"
-        if [[ "$gpu_drv" == "nvidia" ]];then
-            read -rp "Which nvidia version do you want to install? [nvidia/nvidia-dkms/nvidia-open/470xx/390xx]" nvidia_version
-            nvidia_version="${nvidia_version,,}"
-            break
-        elif [[ "$gpu_drv" == "amd" ]];then
-            echo "Will install AMD drivers. (They are part of the kernel.)"
-            break
-        elif [[ "$gpu_drv" == "intel" ]];then
-            echo "Will install Intel drivers."
+    echo
+    if [[ -z "$gpu_choice" || "$gpu_choice" == "y" ]];then
+        if lspci | grep -i "nvidia" >/dev/null; then
+            echo "Select the version of the nvidia driver."
+            select nvidia_version in "nvidia" "nvidia-open" "nvidia-dkms" "470xx" "390xx"; do
+                case $nvidia_version in
+                    "nvidia")
+                        echo "Setting to install nvidia package as driver."
+                        gpu_pkg="nvidia nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        break 2
+                        ;;
+                    "nvidia-open")
+                        echo "Setting to install nvidia-open package as driver."
+                        gpu_pkg="nvidia-open nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        break 2
+                        ;;
+                    "nvidia-dkms")
+                        echo "Setting to install nvidia-dkms packages as driver."
+                        gpu_pkg="nvidia-dkms nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        break 2
+                        ;;
+                    "470xx")
+                        echo "Setting to install 470xx package as driver."
+                        gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils lib32-nvidia-470xx-utils nvidia-470xx-settings libxnvctrl-470xx lib32-libxnvctrl-470xx"
+                        break 2
+                        ;;
+                    "390xx")
+                        echo "Setting to install 390xx package as driver."
+                        gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils lib32-nvidia-390xx-utils nvidia-390xx-settings libxnvctrl-390xx lib32-libxnvctrl-390xx"
+                        break 2
+                        ;;
+                    *)
+                        echo "Provide valid input."
+                        ;;
+                esac
+                done
+        elif lspci | grep -i "amd" >/dev/null; then
+            echo "Setting to install amdgpu."
+            gpu_pkg="mesa lib32-mesa xf86-video-amdgpu"
             break
         else
-            echo "Provide a valid input."
+            echo "Setting to install intel."
+            gpu_pkg="mesa lib32-mesa xf86-video-intel"
+            break
         fi
-    elif [[ "$gpu_choice" == "no" || "$gpu_choice" == "n" ]]; then
+    elif [[ "$gpu_choice" == "n" ]]; then
+        echo "Skipping GPU driver installation."
         break
     else
         echo "Provide a valid input or I will just say womp womp."
@@ -134,33 +162,36 @@ done
 
 # Asking about which bootloader the user uses.
 
-while true; do
-    read -rp "Which bootloader do you use? 1=Grub 2=Syslinux" bootloader
-    bootloader="${bootloader,,}"
-    if [[ "$bootloader" == "1" ]]; then
-        echo "Setting up to update grub configuration."
-        bootloader="grub"
-        break
-    elif [[ "$bootloader" == "2" ]]; then
-        echo "Setting up to update syslinux configuration."
-        bootloader="syslinux"
-        break
-    else
-    echo "Provide a valid input, trust me, it's not that hard."
-    fi
+select bootloader_choice in "Grub" "Syslinux"; do
+    case $bootloader_choice in
+        "Grub")
+            echo "Setting up to update grub configuration..."
+            bootloader="grub"
+            break
+            ;;
+        "Syslinux")
+            echo "Setting up to update syslinux configuration..."
+            bootloader="syslinux"
+            break
+            ;;
+        *)
+            echo "Please provide a valid input, trust me, it's not that hard."
+            ;;
+        esac
 done
 
 # Asking if the user wants to apply performance tweaks from the arch wiki.
 
 while true; do
-    read -rp "Do you want to apply performance tweaks [SAFE, if you are using ext4] from the arch wiki? [Y/n] :" perf_tweaks
+    read -n1 -rp "Do you want to apply performance tweaks [SAFE, if you are using ext4 for root and home partitions.] from the arch wiki? [Y/n] :" perf_tweaks
     perf_tweaks="${perf_tweaks,,}"
-    if [[ "$perf_tweaks" == "" || "$perf_tweaks" == "yes" || "$perf_tweaks" == "y" ]];then
-        echo "The script will apply performance tweaks."
-    break
-    elif [[ "$perf_tweaks" == "no" || "$perf_tweaks" == "n" ]]; then
-        echo "The script will NOT apply performance tweaks."
-    break
+    echo
+    if [[ -z "$perf_tweaks" || "$perf_tweaks" == "y" ]];then
+        echo "The script will apply performance tweaks..."
+        break
+    elif [[ "$perf_tweaks" == "n" ]]; then
+        echo "The script will NOT apply performance tweaks..."
+        break
     else
         echo "Please provide a valid input."
     fi
@@ -169,48 +200,70 @@ done
 # Asking the user if they want to install a DE.
 
 while true; do
-    read -rp "Do you want to install a DE? (You will get three options, KDE, XFCE and Gnome.) [Y/n] :" de_choice
+    read -n1 -rp "Do you want to install a DE? (You will get three options, KDE, XFCE and Gnome.) [Y/n] :" de_choice
     de_choice="${de_choice,,}"
-    if [[ "$de_choice" == "" || "$de_choice" == "yes" || "$de_choice" == "y" ]];then
-        read -rp "Which DE do you want to install? [1=KDE 2=XFCE 3=Gnome]" de_type
-        if [[ "$de_type" == "1" ]]; then
-            read -rp "Which version of KDE do you want to install? [1=Minimal (With select packages.) 2=Meta 3=Full]" kdetype
-            if [[ "$kdetype" == "1" ]]; then
-                echo "The script will install the minimal version of KDE, with a select packages."
-                break
-            elif [[ "$kdetype" == "2" ]]; then
-                echo "The script will install the meta version of KDE."
-                break
-            elif [[ "$kdetype" == "3" ]]; then
-                echo "The script will install the full version of KDE."
-                break
-            else
-                echo "Provide a valid input."
-            fi
-        elif [[ "$de_type" == "2" ]]; then
-            echo "The system will install XFCE."
-            break
-        elif [[ "$de_type" == "3" ]]; then
-            echo "The system will install Gnome."
-            break
-        fi
-    elif [[ "$de_choice" == "no" || "$de_choice" == "n" ]]; then
-        echo "The system will not install a DE."
+    echo
+    if [[ -z "$de_choice" || "$de_choice" == "y" ]];then
+        echo "Select the DE to install."
+        select de_type in "KDE" "XFCE" "Gnome"; do
+            case $de_type in
+                "KDE")
+                    select kdetype in "Minimal" "Meta" "Full"; do
+                        case $kdetype in
+                            "Minimal")
+                                echo "Setting to install Minimal KDE Plasma..."
+                                de_pkg="plasma-desktop konsole kate gwenview haruna partitionmanager ark sddm sddm-kcm dolphin plasma-nm kscreen"
+                                break 3
+                                ;;
+                            "Meta")
+                                echo "Setting to install Meta KDE Plasma..."
+                                de_pkg="plasma-meta sddm"
+                                break 3
+                                ;;
+                            "Full")
+                                echo "Setting to install the Full version of KDE Plasma..."
+                                de_pkg="plasma sddm"
+                                break 3
+                                ;;
+                            *)
+                                echo "Please provide a valid input."
+                                ;;
+                        esac
+                    done
+                    ;;
+                "XFCE")
+                    echo "Setting to install XFCE..."
+                    de_pkg="xfce4 xfce4-goodies lightdm"
+                    break 2
+                    ;;
+                "Gnome")
+                    echo "Setting to install Gnome..."
+                    de_pkg="gnome gdm"
+                    break 2
+                    ;;
+                *)
+                    echo "Please provide a valid input."
+                    ;;
+            esac
+        done
+    elif [[ "$de_choice" == "n" ]]; then
+        echo "Aborting the installation of a DE..."
         break
     else
-        echo "Provide a valid input."
+        echo "Please provide a valid input."
     fi
 done
 
 # Asking if the user wants to install zen-browser-bin.
 
 while true; do
-    read -rp "Do you want to install Zen browser? It's a fork of firefox and I choose this because of mozilla's new privacy policy. [Y/n] : " zen_choice
+    read -n1 -rp "Do you want to install Zen browser? It's a fork of firefox and I choose this because of mozilla's new privacy policy. [Y/n] :" zen_choice
     zen_choice="${zen_choice,,}"
-    if [[ "$zen_choice" == "" || "$zen_choice" == "yes" || "$zen_choice" == "y" ]];then
+    echo
+    if [[ "$zen_choice" == "y" || -z "$zen_choice" ]];then
         echo "The system will install zen browser."
         break
-    elif [[ "$zen_choice" == "no" || "$zen_choice" == "n" ]];then
+    elif [[ "$zen_choice" == "n" ]];then
         echo "The system will NOT install zen browser."
         break
     else
@@ -220,7 +273,7 @@ done
 
 # Exporting variables for child scripts to use.
 
-export dir vulkan_pkg ananicycpporgamemode linux_header user ananicyornot aur_hlp gpu_drv nvidia_version vulkansupport bootloader de_type kdetype
+export dir vulkan_pkg ananicycpporgamemode linux_header user ananicyornot aur_hlp gpu_drv nvidia_version vulkansupport bootloader de_type kdetype de_pkg gpu_pkg
 
 ################ Start of the actual installation. #################
 
@@ -230,16 +283,16 @@ echo "Installing the important pacman packages."
 echo "Starting essential commands."
 ./1-misc-commands.sh
 
-if [[ "$user_choice" == "" || "$user_choice" == "yes" || "$user_choice" == "y" ]]; then
+if [[ -z "$user_choice" || "$user_choice" == "y" ]]; then
     echo "Creating a new user."
     ./2-user-creation.sh
-elif [[ "$user_choice" == "no" || "$user_choice" == "n" ]]; then
+elif [[ "$user_choice" == "n" ]]; then
     echo "Not creating a new user, you probably already have a new user."
 fi
 
 # AUR helper, trizen installation procedure.
 
-if [[ "$trizen_choice" == "" || "$trizen_choice" == "yes" || "$trizen_choice" == "y" ]];then
+if [[ -z "$trizen_choice" || "$trizen_choice" == "y" ]];then
     echo "Installing trizen."
     su - "$user" -c "cd '$dir/scripts' && ./3-install-trizen.sh" # Changing to the new user to make sure aur helper installation goes smoothly.
 elif [[ "$trizen_choice" == "no" || "$trizen_choice" == "n" ]]; then
@@ -250,16 +303,16 @@ cd "$dir"/scripts/ # Getting back to the scripts folder to run the remaining scr
 
 # GPU driver installation section.
 
-if [[ "$gpu_choice" == "" || "$gpu_choice" == "yes" || "$gpu_choice" == "y" ]];then
+if [[ -z "$gpu_choice" || "$gpu_choice" == "y" ]];then
     echo "Starting GPU installation."
     ./4-install-GPU-driver.sh
-elif [[ "$trizen_choice" == "no" || "$trizen_choice" == "n" ]]; then
+elif [[ "$gpu_choice" == "no" || "$gpu_choice" == "n" ]]; then
     echo "Skipping driver installation procedure."
 fi
 
 # Performance tweaks section.
 
-if [[ "$perf_tweaks" == "" || "$perf_tweaks" == "yes" || "$perf_tweaks" == "y" ]];then
+if [[ -z "$perf_tweaks" || "$perf_tweaks" == "y" ]];then
     echo "Starting to apply arch wiki tweaks."
     ./5-performance-tweaks.sh
 elif [[ "$perf_tweaks" == "no" || "$perf_tweaks" == "n" ]];then
@@ -268,7 +321,7 @@ fi
 
 # DE Installation section.
 
-if [[ "$de_choice" == "" || "$de_choice" == "yes" || "$de_choice" == "y" ]];then
+if [[ -z "$de_choice" || "$de_choice" == "y" ]];then
     ./6-install-de.sh
 elif [[ "$de_choice" == "no" || "$de_choice" == "n" ]]; then
     echo "The system will not install a DE."
@@ -276,19 +329,18 @@ fi
 
 # Other packages, and tweaks section.
 
-if [[ "$zen_choice" == "" || "$zen_choice" == "yes" || "$zen_choice" == "y" ]];then
+if [[ -z "$zen_choice" || "$zen_choice" == "y" ]];then
     echo "Installing Zen browser."
     su - "$user" -c "trizen --noconfirm -S zen-browser-bin"
 elif [[ "$zen_choice" == "no" || "$zen_choice" == "n" ]];then
     echo "Skipping the installation of the zen browser."
 fi
 
-if [[ "$de_type" == "1" ]]; then
+if [[ "$de_type" == "KDE" ]]; then
     echo "Stopping and disabling baloo."
     balooctl6 disable
     echo "Editing plasma-x11 service to make sure shutdowns happen normally."
 #    nano "$HOME"/.config/systemd/user/plasma-kwin_x11.service
-    su - "$user" -c 'echo "TimeoutStopSec=1s" >> ~/.config/systemd/user/plasma-kwin_x11.service'
+    echo "TimeoutStopSec=3s" >> /home/"$user"/.config/systemd/user/plasma-kwin_x11.service
 fi
-
 exit 0

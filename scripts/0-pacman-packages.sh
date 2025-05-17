@@ -16,14 +16,18 @@ else
     su -c "pacman -S --needed sudo"
 fi
 
-echo "Installing reflector"
-sudo pacman -S --needed reflector
-echo "Copying pacman.conf for multilib."
-sudo cp -av "$dir"/config/pacman.conf /etc/pacman.conf
-echo "Running reflector for best download performance"
-sudo reflector -n 10 --protocol https --sort rate --save /etc/pacman.d/mirrorlist --download-timeout=20
-echo "Forcing a mirror refresh."
-sudo pacman -Syy
+echo "Installing pacman-contrib."
+sudo pacman -S --needed pacman-contrib
+sudo ./sort-mirrors.sh
+echo "Enabling multilib... and Color+ILoveCandy! Because everyone deserves some color and eye candy in their package manager!"
+sudo sed -i \
+  -e '/^\[multilib\]/s/^#//' \
+  -e '/^#Include = \/etc\/pacman.d\/mirrorlist/s/^#//' \
+  -e '/^#Color/s/^#//' \
+  -e '/^Color$/a ILoveCandy' \
+  /etc/pacman.conf
+echo "Forcing a mirror refresh and making sure the system is up to date."
+sudo pacman -Syyu
 echo "Installing packages."
 sudo pacman -S --needed --noconfirm nftables alsa-utils base-devel git cpupower ccache $ananicycpporgamemode mold $linux_header $vulkan_pkg
 echo "Important packages installed successfully."
