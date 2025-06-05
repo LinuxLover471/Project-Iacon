@@ -1,0 +1,11 @@
+# https://store.steampowered.com/app/21090
+{ "name": "FEAR.exe", "type": "game"}
+{ "name": "FEARMP.exe", "type": "game"}
+{ "name": "FEARXP.exe", "type": "game"}
+{ "name": "FEARXP2.exe", "type": "game"}
+
+# https://store.steampowered.com/app/16450
+{ "name": "FEAR2.exe", "type": "game"}
+
+# https://store.steampowered.com/app/21100
+{ "name": "F.E.A.R. 3.exe", "type": "game"}
