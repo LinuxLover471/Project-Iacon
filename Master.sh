@@ -270,8 +270,5 @@ fi
 if [[ "$de_type" == "KDE" ]]; then
     echo "Stopping and disabling baloo."
     balooctl6 disable
-    echo "Editing plasma-x11 service to make sure shutdowns happen normally."
-#    nano "$HOME"/.config/systemd/user/plasma-kwin_x11.service
-    echo "TimeoutStopSec=3s" >> /home/"$USER"/.config/systemd/user/plasma-kwin_x11.service
 fi
 exit 0
