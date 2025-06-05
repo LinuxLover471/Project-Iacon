@@ -16,13 +16,29 @@ else
     su -c "pacman -S --needed sudo"
 fi
 
-#echo "Enabling multilib... and Color+ILoveCandy! Because everyone deserves some color and eye candy in their package manager!"
-#sudo sed -i \
-# -e '/^\[multilib\]/s/^#//' \
-# -e '/^#Include = \/etc\/pacman.d\/mirrorlist/s/^#//' \
-# -e '/^#Color/s/^#//' \
-# -e '/^Color$/a ILoveCandy' \
-# /etc/pacman.conf
+echo "Enabling multilib... and Color+ILoveCandy! Because everyone deserves some color and eye candy in their package manager!"
+sudo awk '
+/^\s*#?\[multilib\]/ {
+    print "[multilib]"
+    in_multilib = 1
+    next
+}
+/^\s*#Include = \/etc\/pacman.d\/mirrorlist/ {
+    if (in_multilib) {
+        print "Include = /etc/pacman.d/mirrorlist"
+        in_multilib = 0
+        next
+    }
+}
+{
+    print
+    in_multilib = 0
+}
+' /etc/pacman.conf > /tmp/pacman.conf && sudo mv /tmp/pacman.conf /etc/pacman.conf
+sudo sed -i \
+ -e '/^#Color/s/^#//' \
+ -e '/^Color$/a ILoveCandy' \
+ /etc/pacman.conf
 echo "Forcing a mirror refresh and making sure the system is up to date."
 sudo pacman -Syyu
 echo "Installing packages."
