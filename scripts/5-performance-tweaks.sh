@@ -14,7 +14,9 @@ if [[ "$bootloader" == "grub" ]]; then
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 elif [[ "$bootloader" == "syslinux" ]]; then
     echo "Adding syslinux parameters."
-    sudo sed -i '/^APPEND / s|$| loglevel=3 quiet nowatchdog nvidia_drm.modeset=1 zswap.enabled=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 zswap.max_pool_percent=35 zswap.accept_threshold_percent=95|' /boot/syslinux/syslinux.cfg
+sudo sed -i '/^LABEL arch/,/^LABEL / {
+    /^APPEND / s/$/ nvidia-drm.modeset=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 quiet loglevel=3/
+}' /boot/syslinux/syslinux.cfg
 else
     echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
 fi

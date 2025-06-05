@@ -3,8 +3,7 @@ echo "Setting up NTP, automatic network time setup."
 sudo timedatectl set-ntp true
 echo "Setting up cpupower for to set performance governor as default."
 sudo systemctl enable cpupower
-sudo sed -i '/^governor=/d' /etc/default/cpupower
-echo "governor='performance'" | sudo tee -a /etc/default/cpupower >/dev/null
+sudo cp "$dir"/config/cpupower /etc/default/cpupower
 echo "setting up nftables."
 sudo systemctl enable nftables
 
