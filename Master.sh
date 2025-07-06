@@ -13,7 +13,7 @@ while true; do
     echo
     if [[ -z "$vulkansupport" || "$vulkansupport" == "y" ]]; then
         echo "Setting to install vulkan support..."
-        vulkan_pkg="vulkan-icd-loader lib32-vulkan-icd-loader"
+        vulkan_pkg="vulkan-icd-loader"
         break
     elif [[ "$vulkansupport" == "n" ]]; then
         echo "Vulkan support will NOT be installed..."
@@ -55,27 +55,27 @@ while true; do
                 case $nvidia_version in
                     "nvidia")
                         echo "Setting to install nvidia package as driver."
-                        gpu_pkg="nvidia nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia nvidia-utils libxnvctrl"
                         break 2
                         ;;
                     "nvidia-open")
                         echo "Setting to install nvidia-open package as driver."
-                        gpu_pkg="nvidia-open nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia-open nvidia-utils libxnvctrl"
                         break 2
                         ;;
                     "nvidia-dkms")
                         echo "Setting to install nvidia-dkms packages as driver."
-                        gpu_pkg="nvidia-dkms nvidia-utils lib32-nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia-dkms nvidia-utils libxnvctrl"
                         break 2
                         ;;
                     "470xx")
                         echo "Setting to install 470xx package as driver."
-                        gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils lib32-nvidia-470xx-utils nvidia-470xx-settings libxnvctrl-470xx lib32-libxnvctrl-470xx"
+                        gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils nvidia-470xx-settings libxnvctrl-470xx"
                         break 2
                         ;;
                     "390xx")
                         echo "Setting to install 390xx package as driver."
-                        gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils lib32-nvidia-390xx-utils nvidia-390xx-settings libxnvctrl-390xx lib32-libxnvctrl-390xx"
+                        gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils nvidia-390xx-settings libxnvctrl-390xx"
                         break 2
                         ;;
                     *)
@@ -86,12 +86,12 @@ while true; do
         elif lspci | grep -i "amd" >/dev/null; then
             gpu_drv="amd"
             echo "Setting to install amdgpu."
-            gpu_pkg="mesa lib32-mesa xf86-video-amdgpu"
+            gpu_pkg="mesa xf86-video-amdgpu"
             break
         else
             gpu_drv="intel"
             echo "Setting to install intel."
-            gpu_pkg="mesa lib32-mesa xf86-video-intel"
+            gpu_pkg="mesa xf86-video-intel"
             break
         fi
     elif [[ "$gpu_choice" == "n" ]]; then
@@ -154,17 +154,17 @@ while true; do
                         case $kdetype in
                             "Minimal")
                                 echo "Setting to install Minimal KDE Plasma..."
-                                de_pkg="plasma-desktop konsole kate gwenview haruna partitionmanager ark sddm sddm-kcm dolphin plasma-nm kscreen"
+                                de_pkg="plasma-desktop konsole kate gwenview haruna partitionmanager ark sddm sddm-kcm dolphin plasma-nm kscreen plasma-x11-session"
                                 break 3
                                 ;;
                             "Meta")
                                 echo "Setting to install Meta KDE Plasma..."
-                                de_pkg="plasma-meta sddm"
+                                de_pkg="plasma-meta sddm plasma-x11-session"
                                 break 3
                                 ;;
                             "Full")
                                 echo "Setting to install the Full version of KDE Plasma..."
-                                de_pkg="plasma sddm"
+                                de_pkg="plasma sddm plasma-x11-session"
                                 break 3
                                 ;;
                             *)
@@ -196,17 +196,17 @@ while true; do
     fi
 done
 
-# Asking if the user wants to install zen-browser-bin.
+# Asking if the user wants to install firefox.
 
 while true; do
-    read -n1 -rp "Do you want to install Zen browser? It's a fork of firefox and I choose this because of mozilla's new privacy policy. [Y/n] :" zen_choice
-    zen_choice="${zen_choice,,}"
+    read -n1 -rp "Do you want to install the firefox browser? [Y/n] :" firefox_choice
+    firefox_choice="${firefox_choice,,}"
     echo
-    if [[ "$zen_choice" == "y" || -z "$zen_choice" ]];then
-        echo "The system will install zen browser."
+    if [[ "$firefox_choice" == "y" || -z "$firefox_choice" ]];then
+        echo "The system will install the firefox browser."
         break
-    elif [[ "$zen_choice" == "n" ]];then
-        echo "The system will NOT install zen browser."
+    elif [[ "$firefox_choice" == "n" ]];then
+        echo "The system will NOT install the firefox browser."
         break
     else
         echo "Please provide a valid input."
@@ -260,11 +260,11 @@ fi
 
 # Other packages, and tweaks section.
 
-if [[ -z "$zen_choice" || "$zen_choice" == "y" ]];then
-    echo "Installing Zen browser."
-    trizen --noconfirm -S zen-browser-bin
+if [[ -z "$firefox_choice" || "$firefox_choice" == "y" ]];then
+    echo "Installing firefox browser."
+    sudo pacman -S --noconfirm --needed firefox
 elif [[ "$zen_choice" == "no" || "$zen_choice" == "n" ]];then
-    echo "Skipping the installation of the zen browser."
+    echo "Skipping the installation of the firefox browser."
 fi
 
 if [[ "$de_type" == "KDE" ]]; then

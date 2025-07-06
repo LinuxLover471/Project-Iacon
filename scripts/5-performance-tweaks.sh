@@ -10,12 +10,12 @@ sudo cp /etc/fstab /etc/fstab.bak
 
 if [[ "$bootloader" == "grub" ]]; then
     echo "Updating GRUB config."
-    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet nvidia_drm.modeset=1 zswap.enabled=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 zswap.max_pool_percent=35 zswap.accept_threshold_percent=95"/' /etc/default/grub
+    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 zswap.enabled=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 zswap.max_pool_percent=35 zswap.accept_threshold_percent=95 quiet loglevel=3"/' /etc/default/grub
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 elif [[ "$bootloader" == "syslinux" ]]; then
     echo "Adding syslinux parameters."
 sudo sed -i '/^LABEL arch/,/^LABEL / {
-    /^APPEND / s/$/ nvidia-drm.modeset=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 quiet loglevel=3/
+    /^APPEND / s/$/ nvidia_drm.modeset=1 zswap.enabled=1 rootflags=rw,defaults,commit=60,noatime usbcore.autosuspend=-1 zswap.max_pool_percent=35 zswap.accept_threshold_percent=95 loglevel=3 quiet/
 }' /boot/syslinux/syslinux.cfg
 else
     echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
@@ -46,13 +46,13 @@ sudo tune2fs -O fast_commit "$root_dev"
 sudo tune2fs -O fast_commit "$home_dev"
 
 echo "Copying I/O Scheduler rules."
-sudo cp -av "$dir"/config/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
+sudo cp -v "$dir"/config/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 
 echo "Copying vm.swappiness configuration."
-sudo cp -av "$dir"/config/99-swappiness.conf /etc/sysctl.d/99-swappiness.conf
+sudo cp -v "$dir"/config/99-swappiness.conf /etc/sysctl.d/99-swappiness.conf
 
 echo "Copying configuration to disable core dumps."
-sudo cp -av "$dir"/config/50-coredump.conf /etc/sysctl.d/50-coredump.conf
+sudo cp -v "$dir"/config/50-coredump.conf /etc/sysctl.d/50-coredump.conf
 
 echo "Enabling fstrim.timer to optimize SSD performance."
 sudo systemctl enable fstrim.timer

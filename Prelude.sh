@@ -36,7 +36,7 @@ select ananicyornot in "ananicy-cpp" "gamemode"; do
             ;;
         "gamemode")
             echo "Setting to install gamemode..."
-            ananicycpporgamemode="gamemode lib32-gamemode"
+            ananicycpporgamemode="gamemode"
             break
             ;;
         *)
@@ -48,12 +48,12 @@ done
 # Asking about installing necessary vulkan support.
 
 while true; do
-    read -n1 -rp "Do you want to install vulkan icd loader and it's lib32? It's important for vulkan support [Y/n]" vulkansupport
+    read -n1 -rp "Do you want to install vulkan icd loader? It's important for vulkan support [Y/n]" vulkansupport
     vulkansupport="${vulkansupport,,}"
     echo
     if [[ -z "$vulkansupport" || "$vulkansupport" == "y" ]]; then
         echo "Setting to install vulkan support..."
-        vulkan_pkg="vulkan-icd-loader lib32-vulkan-icd-loader"
+        vulkan_pkg="vulkan-icd-loader"
         break
     elif [[ "$vulkansupport" == "n" ]]; then
         echo "Vulkan support will NOT be installed..."
