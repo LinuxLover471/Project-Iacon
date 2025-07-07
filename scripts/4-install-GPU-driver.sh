@@ -3,7 +3,7 @@
 
 if [[ "$gpu_drv" == "nvidia" ]]; then
     echo "Copying mkinitcpio.conf to setup the driver."
-    sudo cp -v "$dir"/config/mkinitcpio.conf /etc/mkinitcpio.conf
+    sudo cp -v "$dir"/config/mkinitcpio-nvidia.conf /etc/mkinitcpio.conf
     if [[ "$nvidia_version" == "nvidia" ]]; then
         echo "Installing default nvidia driver and it's components."
         sudo pacman -S --noconfirm --needed $gpu_pkg
