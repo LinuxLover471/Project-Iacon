@@ -236,7 +236,7 @@ cd "$dir"/scripts/ # Getting back to the scripts folder to run the remaining scr
 
 if [[ -z "$gpu_choice" || "$gpu_choice" == "y" ]];then
     echo "Starting GPU installation."
-    ./4-install-GPU-driver.sh
+    ./4-install-gpu-driver.sh
 elif [[ "$gpu_choice" == "no" || "$gpu_choice" == "n" ]]; then
     echo "Skipping driver installation procedure."
 fi
