@@ -55,27 +55,27 @@ while true; do
                 case $nvidia_version in
                     "nvidia")
                         echo "Setting to install nvidia package as driver."
-                        gpu_pkg="nvidia nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia nvidia-utils"
                         break 2
                         ;;
                     "nvidia-open")
                         echo "Setting to install nvidia-open package as driver."
-                        gpu_pkg="nvidia-open nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia-open nvidia-utils"
                         break 2
                         ;;
                     "nvidia-dkms")
                         echo "Setting to install nvidia-dkms packages as driver."
-                        gpu_pkg="nvidia-dkms nvidia-utils libxnvctrl"
+                        gpu_pkg="nvidia-dkms nvidia-utils"
                         break 2
                         ;;
                     "470xx")
                         echo "Setting to install 470xx package as driver."
-                        gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils nvidia-470xx-settings libxnvctrl-470xx"
+                        gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils nvidia-470xx-settings"
                         break 2
                         ;;
                     "390xx")
                         echo "Setting to install 390xx package as driver."
-                        gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils nvidia-390xx-settings libxnvctrl-390xx"
+                        gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils nvidia-390xx-settings"
                         break 2
                         ;;
                     *)
@@ -142,7 +142,7 @@ done
 # Asking the user if they want to install a DE.
 
 while true; do
-    read -n1 -rp "Do you want to install a DE? (You will get three options, KDE, XFCE, Gnome and i3.) [Y/n] :" de_choice
+    read -n1 -rp "Do you want to install a DE? (You will get three options, KDE, XFCE, Gnome and i3, i3 is setted up for the creator of this script.) [Y/n] :" de_choice
     de_choice="${de_choice,,}"
     echo
     if [[ -z "$de_choice" || "$de_choice" == "y" ]];then
@@ -185,7 +185,7 @@ while true; do
                     ;;
 		"i3")
 		    echo "Setting to install i3... more personalised for the creator."
-		    de_pkg="i3 polybar picom dunst rofi kitty nnn neovim"
+		    de_pkg="i3 polybar picom dunst rofi kitty nnn neovim ly thunar gvfs redshift inter-font ttf-fira-code xarchiver feh"
 		    break 2
 		    ;;
                 *)

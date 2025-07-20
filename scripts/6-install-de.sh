@@ -21,6 +21,10 @@ elif [[ "$de_type" == "Gnome" ]]; then
     echo "Installing Gnome."
     sudo pacman -S --needed --noconfirm $de_pkg
     sudo systemctl enable gdm
+elif [[ "$de_type" == "i3" ]]; then
+	echo "Installing i3."
+	sudo pacman -S --needed --noconfirm $de_pkg
+	sudo systemctl enable ly
 else
   echo "Invalid DE choice: $de_type"
   exit 1
