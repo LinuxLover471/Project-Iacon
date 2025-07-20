@@ -27,17 +27,17 @@ done
 # Asking about installing trizen or not.
 
 while true; do
-    read -n1 -rp "Do you want to install trizen? (It's important for installing some older nvidia graphics drivers.) Also if you use something else like aurutils or not a pacman wrapper, the aur packages installation may (most likely will) fail. [Y/n] :"  trizen_choice
-    trizen_choice="${trizen_choice,,}"
+	read -n1 -rp "Do you want to install aurutils? (Essential for the installation of specific NVIDIA drivers) [Y/n] :"  aur_choice
+    aur_choice="${aur_choice,,}"
     echo
-    if [[ -z "$trizen_choice" || "$trizen_choice" == "y" ]];then
-        echo "Setting to install and use trizen..."
+    if [[ -z "$aur_choice" || "$aur_choice" == "y" ]];then
+        echo "Setting to install and use aurutils..."
         break
-    elif [[ "$trizen_choice" == "n" ]]; then
-        echo "Then, trizen will not be installed, but AUR installation, GPU drivers, zen browser installation will fail."
+    elif [[ "$aur_choice" == "n" ]]; then
+        echo "aurutils will not be installed, but AUR installation, GPU drivers installation will fail."
         break
     else
-        echo "Please provide a valid input or I will never forgive you."
+        echo "Please provide a valid input."
     fi
 done
 
@@ -142,12 +142,12 @@ done
 # Asking the user if they want to install a DE.
 
 while true; do
-    read -n1 -rp "Do you want to install a DE? (You will get three options, KDE, XFCE and Gnome.) [Y/n] :" de_choice
+    read -n1 -rp "Do you want to install a DE? (You will get three options, KDE, XFCE, Gnome and i3.) [Y/n] :" de_choice
     de_choice="${de_choice,,}"
     echo
     if [[ -z "$de_choice" || "$de_choice" == "y" ]];then
         echo "Select the DE to install."
-        select de_type in "KDE" "XFCE" "Gnome"; do
+        select de_type in "KDE" "XFCE" "Gnome" "i3"; do
             case $de_type in
                 "KDE")
                     select kdetype in "Minimal" "Meta" "Full"; do
@@ -183,6 +183,11 @@ while true; do
                     de_pkg="gnome gdm"
                     break 2
                     ;;
+		"i3")
+		    echo "Setting to install i3... more personalised for the creator."
+		    de_pkg="i3 polybar picom dunst rofi kitty nnn neovim"
+		    break 2
+		    ;;
                 *)
                     echo "Please provide a valid input."
                     ;;
@@ -223,14 +228,14 @@ cd "$dir"/scripts/ #Enter the source directory to make sure the scripts are exec
 
 # AUR helper, trizen installation procedure.
 
-if [[ -z "$trizen_choice" || "$trizen_choice" == "y" ]];then
-    echo "Installing trizen."
-    ./3-install-trizen.sh # Changing to the new user to make sure aur helper installation goes smoothly.
-elif [[ "$trizen_choice" == "no" || "$trizen_choice" == "n" ]]; then
-    echo "Not installing trizen."
+if [[ -z "$aur_choice" || "$aur_choice" == "y" ]];then
+    echo "Installing aurutils."
+    ./3-install-aurutils.sh # Changing to the new user to make sure aur helper installation goes smoothly.
+elif [[ "$aur_choice" == "no" || "$aur_choice" == "n" ]]; then
+    echo "Not installing aurutils."
 fi
 
-cd "$dir"/scripts/ # Getting back to the scripts folder to run the remaining scripts as it got messed up while installing trizen.
+cd "$dir"/scripts/ # Getting back to the scripts directory as it got messed up while installing aurutils.
 
 # GPU driver installation section.
 

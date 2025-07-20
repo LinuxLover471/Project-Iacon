@@ -15,10 +15,12 @@ if [[ "$gpu_drv" == "nvidia" ]]; then
         sudo pacman -S --noconfirm --needed $gpu_pkg
     elif [[ "$nvidia_version" == "470xx" ]]; then
         echo "Installing 470xx nvidia driver and it's components."
-        trizen -S --noconfirm $gpu_pkg --needed
+        aur sync --noconfirm --needed $gpu_pkg
+	sudo pacman -S --noconfirm --needed $gpu_pkg
     elif [[ "$nvidia_version" == "390xx" ]]; then
         echo "Installing 390xx nvidia driver and it's components."
-        trizen -S --noconfirm $gpu_pkg
+        aur sync --noconfirm --needed $gpu_pkg
+	sudo pacman -S --noconfirm --needed $gpu_pkg
     fi
 
 # Beginning of AMD driver section.

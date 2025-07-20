@@ -42,6 +42,6 @@ sudo sed -i \
 echo "Forcing a mirror refresh and making sure the system is up to date."
 sudo pacman -Syyu
 echo "Installing packages."
-sudo pacman -S --needed --noconfirm nftables alsa-utils base-devel git cpupower ccache $ananicycpporgamemode mold $linux_header $vulkan_pkg
+sudo pacman -S --needed --noconfirm nftables alsa-utils base-devel git cpupower ccache $ananicycpporgamemode vifm mold $linux_header $vulkan_pkg
 echo "Important packages installed successfully."
 exit 0
