@@ -9,12 +9,12 @@
 - **Minimal Distraction Workflow**  
   Prompts are clearly defined and asked upfront to avoid interruptions mid-process.
 
-- **Automatic GPU Driver Installation**  
-  Detects and installs the appropriate GPU drivers based on your hardware.
+- **Automatic GPU Brand Detection**  
+  Automatically detects the brand of the GPU based on your hardware.
 
 - **Arch Wiki-Based Performance Tweaks**  
   Applies several proven system tweaks for performance, assuming:
-  - Your root (`/`) and home (`/home`) partitions are on `ext4`.
+  - Your root (`/`) and home (`/home`) partitions are `ext4`.
 
 - **Automatic User Creation**  
   Adds a new user and sets up defaults to reduce post-install steps.
