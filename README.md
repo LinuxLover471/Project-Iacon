@@ -15,6 +15,7 @@
 - **Arch Wiki-Based Performance Tweaks**  
   Applies several proven system tweaks for performance, assuming:
   - Your root (`/`) and home (`/home`) partitions are on `ext4`.
+  IF you don't have a root and /home partition as ext4, you can apply other safe tweaks.
 
 - **Automatic User Creation**  
   Adds a new user and sets up defaults to reduce post-install steps.
