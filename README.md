@@ -1,6 +1,6 @@
 # Project Iacon
 
-**Project Iacon** is a set of Bash scripts designed to streamline post-installation setup and configuration for Arch Linux users. It automates essential tasks and applies performance tweaks from the [Arch Wiki](https://wiki.archlinux.org), aiming to provide a faster and more consistent setup experience with minimal user intervention.
+**Project Iacon** is a set of Bash scripts designed to streamline post-installation setup and configuration for Arch Linux users. It automates essential tasks and applies performance and latency tweaks from the [Arch Wiki](https://wiki.archlinux.org), aiming to provide a faster and more consistent setup experience with minimal user intervention.
 
 ---
 
