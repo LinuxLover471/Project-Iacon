@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 # Getting filesystem block names for root and home partitions
 root_dev=$(findmnt -n -o SOURCE /)
 home_dev=$(findmnt -n -o SOURCE /home | grep '^/dev/')

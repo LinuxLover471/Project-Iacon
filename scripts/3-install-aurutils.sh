@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euo pipefail
 AUR_DIR="/var/cache/pacman/aurutils"
 
 echo "Copying aurutils repo with git clone."

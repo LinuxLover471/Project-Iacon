@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 echo "Setting up NTP, automatic network time setup."
 sudo timedatectl set-ntp true
 

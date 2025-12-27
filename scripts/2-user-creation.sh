@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 useradd -m -G wheel -s /bin/bash "$user"
 echo "Setup the new password for the '$user'"
 passwd "$user"

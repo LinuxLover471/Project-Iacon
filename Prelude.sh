@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Prevent possible breakage.
+set -euo pipefail
+
 dir="$(pwd)"
 
 echo "Hello, this is the prelude part of the master script."

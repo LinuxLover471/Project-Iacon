@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 function check_and_install_vulkan() {
   if [[ "$vulkansupport" == "y" ]]; then
     sudo pacman -S --noconfirm --needed vulkan-icd-loader "$@"

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Check if we're running as root or not
 
 if [[ "$USER" == "root" ]]; then

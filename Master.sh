@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 dir="$(pwd)" # Finds the current directory from which the script is run.
 ################ Asking everything at start to not mess with the user in the middle of the installation. ################
 
