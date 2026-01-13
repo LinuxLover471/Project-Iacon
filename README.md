@@ -36,8 +36,8 @@
 ## 🛠️ Usage
 
 ```bash
-git clone --recurse-submodules https://github.com/linuxlover471/project-iacon.git
-cd project-iacon
+git clone --recursive https://github.com/linuxlover471/Project-Iacon.git
+cd Project-Iacon
 
 # Run the Prelude script as root
 ./Prelude.sh
