@@ -13,49 +13,49 @@ kernel_parameters="zswap.enabled=1 zswap.max_pool_percent=35 zswap.compressor=lz
 sudo cp /etc/fstab /etc/fstab.bak
 
 ### Insert kernel parameters. ###
-if [[ "$gpu_drv" == "nvidia" ]]; then
-  if [[ "$bootloader" == "grub" ]]; then
+if [[ ${gpu_drv} == "nvidia" ]]; then
+  if [[ ${bootloader} == "grub" ]]; then
     echo "Updating GRUB config."
-    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 '$kernel_parameters'"/' /etc/default/grub
+    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 '${kernel_parameters}'"/' /etc/default/grub
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-  elif [[ "$bootloader" == "syslinux" ]]; then
+  elif [[ ${bootloader} == "syslinux" ]]; then
     echo "Adding syslinux parameters."
     sudo sed -i '/^LABEL arch/,/^LABEL / {
-      /^[[:space:]]*APPEND / s/$/ nvidia_drm.modeset=1 '$kernel_parameters'/
+      /^[[:space:]]*APPEND / s/$/ nvidia_drm.modeset=1 '${kernel_parameters}'/
   }' /boot/syslinux/syslinux.cfg
 
   else
-    echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
+    echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
   echo "Enabling PAT for better performance on Pentium III and newer CPUs, and enabling Preserve video memory after suspend."
-  sudo cp "$dir"/config/nvidia.conf /etc/modprobe.d/nvidia.conf
+  sudo cp "${dir}"/config/nvidia.conf /etc/modprobe.d/nvidia.conf
 
 else
   # Bootloader parameters.
-  if [[ "$bootloader" == "grub" ]]; then
+  if [[ ${bootloader} == "grub" ]]; then
     echo "Updating GRUB config."
-    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="'$kernel_parameters'"/' /etc/default/grub
+    sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="'${kernel_parameters}'"/' /etc/default/grub
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-  elif [[ "$bootloader" == "syslinux" ]]; then
+  elif [[ ${bootloader} == "syslinux" ]]; then
     echo "Adding syslinux parameters."
     sudo sed -i '/^LABEL arch/,/^LABEL / {
-      /^[[:space:]]*APPEND / s/$/ '$kernel_parameters'/
+      /^[[:space:]]*APPEND / s/$/ '${kernel_parameters}'/
   }' /boot/syslinux/syslinux.cfg
 
   else
-    echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
+    echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
   # Mkinitcpio tweaks for AMD and Intel.
   echo "Copying mkinitcpio for faster boot times."
-  sudo cp "$dir"/config/mkinitcpio-other-gpu.conf /etc/mkinitcpio.conf
+  sudo cp "${dir}"/config/mkinitcpio-other-gpu.conf /etc/mkinitcpio.conf
   echo "Updating initramfs."
   sudo mkinitcpio -P
 fi
 
 ### Beginning of EXT4 Tweaks. ###
-if [[ $ext4_tweaks == "y" ]]; then
+if [[ ${ext4_tweaks} == "y" ]]; then
   # Modify the old fstab.
   # Comment out the root (/) line to make sure the rw options in the bootloader kernel parameters work.
   echo "Adding # before root partition to ensure kernel parameters have any effect."
@@ -68,23 +68,23 @@ if [[ $ext4_tweaks == "y" ]]; then
   # EXT4 Tweaks.
   echo "Appling EXT4-specific tweaks."
   echo "Enabling fast_commit."
-  sudo tune2fs -O fast_commit "$root_dev"
-  sudo tune2fs -O fast_commit "$home_dev"
+  sudo tune2fs -O fast_commit ${root_dev}
+  sudo tune2fs -O fast_commit ${home_dev}
 
   # Bootloader steps.
-  if [[ "$bootloader" == "grub" ]]; then
+  if [[ ${bootloader} == "grub" ]]; then
     echo "Adding rootflags in grub."
     sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="rootflags=rw,defaults,commit=20,noatime"/' /etc/default/grub
     sudo grub-mkconfig -o /boot/grub/grub.cfg
 
-  elif [[ "$bootloader" == "syslinux" ]]; then
+  elif [[ ${bootloader} == "syslinux" ]]; then
     echo "Adding rootflags in syslinux."
     sudo sed -i '/^LABEL arch/,/^LABEL / {
       /^[[:space:]]*APPEND / s/$/ rootflags=rw,defaults,commit=20,noatime/
   }' /boot/syslinux/syslinux.cfg
 
   else
-    echo "Unknown bootloader: $bootloader. Skipping bootloader-specific steps."
+    echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
 
 else
@@ -92,9 +92,9 @@ else
 fi
 
 # Modify swap options if present and handle RAID and no swap partition.
-if [[ $swapdev == /dev/md* ]]; then
-  echo "Warning: swap is on RAID device $swapdev. Enabling discard on swap can cause system lockups."
-elif [[ "$swapdev" == "" ]]; then
+if [[ ${swapdev} == /dev/md* ]]; then
+  echo "Warning: swap is on RAID device ${swapdev}. Enabling discard on swap can cause system lockups."
+elif [[ ${swapdev} == "" ]]; then
   echo "No swap partition found."
 else
   echo "Adding discard to swap."
@@ -102,27 +102,27 @@ else
 fi
 
 echo "Copying optimizations of makepkg."
-sudo cp "$dir"/config/rust.conf /etc/makepkg.conf.d/rust.conf
-sudo cp "$dir"/config/makepkg.conf /etc/makepkg.conf
+sudo cp "${dir}"/config/rust.conf /etc/makepkg.conf.d/rust.conf
+sudo cp "${dir}"/config/makepkg.conf /etc/makepkg.conf
 
 echo "Copying I/O Scheduler rules."
-sudo cp "$dir"/config/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
+sudo cp "${dir}"/config/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 
 echo "Copying vm.swappiness configuration."
-sudo cp "$dir"/config/99-swappiness.conf /etc/sysctl.d/99-swappiness.conf
+sudo cp "${dir}"/config/99-swappiness.conf /etc/sysctl.d/99-swappiness.conf
 
 echo "Copying configuration to disable core dumps."
-sudo cp "$dir"/config/50-coredump.conf /etc/sysctl.d/50-coredump.conf
+sudo cp "${dir}"/config/50-coredump.conf /etc/sysctl.d/50-coredump.conf
 
 echo "Copying game compatibility vm.max_map_count tweak."
-sudo cp "$dir"/config/80-gamecompatibility.conf /etc/sysctl.d/80-gamecompatibility.conf
+sudo cp "${dir}"/config/80-gamecompatibility.conf /etc/sysctl.d/80-gamecompatibility.conf
 
 echo "Copying response time tweaks."
-sudo cp "$dir"/config/consistent-response-time-for-gaming.conf /etc/tmpfiles.d/consistent-response-time-for-gaming.conf
+sudo cp "${dir}"/config/consistent-response-time-for-gaming.conf /etc/tmpfiles.d/consistent-response-time-for-gaming.conf
 
 echo "Copying pcie latency tweaks and making a service."
-sudo cp "$dir"/config/set-pcie-latency.sh /usr/local/bin/
-sudo cp "$dir"/config/set-pcie-latency.service /etc/systemd/system/
+sudo cp "${dir}"/config/set-pcie-latency.sh /usr/local/bin/
+sudo cp "${dir}"/config/set-pcie-latency.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable set-pcie-latency.service
 

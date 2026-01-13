@@ -2,38 +2,38 @@
 
 set -euo pipefail
 
+function setup_ananicy_cpp() {
+  echo "Enabling ananicy-cpp and setting it's configuration"
+  sudo systemctl enable ananicy-cpp.service
+  sudo cp -r "${dir}"/ananicy-rules/* /etc/ananicy.d/
+}
+
+function setup_gamemode() {
+  echo "Adding ${user} to gamemode user group."
+  sudo usermod -aG gamemode ${user}
+  echo "Setting up gamemode.ini for better niceness."
+  sudo cp "${dir}"/config/gamemode.ini /etc/gamemode.ini
+}
+
 echo "Setting up NTP, automatic network time setup."
 sudo timedatectl set-ntp true
 
 echo "Setting up cpupower for to set schedutil governor as default."
 sudo systemctl enable cpupower
-sudo cp -v "$dir"/config/cpupower /etc/default/cpupower
+sudo cp "${dir}"/config/cpupower /etc/default/cpupower
 
 echo "setting up nftables."
 sudo systemctl enable nftables
 
-if [[ "$ananicyornot" == "ananicy-cpp" ]]; then
-  echo "Enabling ananicy-cpp and setting it's configuration"
-  sudo systemctl enable ananicy-cpp.service
-  sudo cp -v "$dir"/ananicy-rules/* /etc/ananicy.d/
+if [[ ${ananicyornot} == "ananicy-cpp" ]]; then
+  setup_ananicy_cpp
 
-elif [[ "$ananicyornot" == "gamemode" ]]; then
-  echo "Adding $user to gamemode user group."
-  sudo usermod -aG gamemode "$user"
-  echo "Setting up gamemode.ini for better niceness."
-  sudo cp -v "$dir"/config/gamemode.ini /etc/gamemode.ini
+elif [[ ${ananicyornot} == "gamemode" ]]; then
+  setup_gamemode
 
 else
-  # Ananicy-cpp.
-  echo "Enabling ananicy-cpp and copying rules."
-  sudo systemctl enable ananicy-cpp.service
-  sudo cp -v "$dir"/ananicy-rules/* /etc/ananicy.d/
-
-  # Gamemode.
-  echo "Adding $user to gamemode user group."
-  sudo usermod -aG gamemode "$user"
-  echo "Setting up gamemode.ini for better niceness."
-  sudo cp -v "$dir"/config/gamemode.ini /etc/gamemode.ini
+  setup_ananicy_cpp
+  setup_gamemode
 fi
 
 echo "Misc optimizations performed successfully."
