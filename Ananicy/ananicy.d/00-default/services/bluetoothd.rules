@@ -1,2 +1,0 @@
-# http://linux.die.net/man/8/bluetoothd
-{ "name": "bluetoothd", "type": "service" }

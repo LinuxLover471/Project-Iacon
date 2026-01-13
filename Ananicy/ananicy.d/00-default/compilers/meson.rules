@@ -1,3 +1,0 @@
-# http://mesonbuild.com - Meson is an open source build system.
-{ "name": "ninja", "type": "compiler" }
-{ "name": "meson", "type": "compiler" }

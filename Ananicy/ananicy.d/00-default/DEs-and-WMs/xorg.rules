@@ -1,2 +1,0 @@
-# Rule for Xorg server, runs the graphical desktop.
-{ "name": "Xorg", "type": "DEWM" }

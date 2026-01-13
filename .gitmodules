@@ -1,0 +1,3 @@
+[submodule "ananicy-rules"]
+	path = ananicy-rules
+	url = https://github.com/CachyOS/ananicy-rules.git

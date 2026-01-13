@@ -1,4 +1,0 @@
-# http://cvs.schmorp.de/rxvt-unicode/ 
-{ "name": "urxvt", "type": "terminal" }
-{ "name": "urxvtd", "type": "terminal" }
-{ "name": "urxvtc", "type": "terminal" }

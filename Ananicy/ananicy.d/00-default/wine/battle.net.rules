@@ -1,9 +1,0 @@
-# Battle.net - https://www.blizzard.com/apps/battle.net/desktop
-{"name":"Battle.net.exe", "type":"game-launcher"}
-{"name":"Agent.exe", "type":"game-launcher"}
-
-# Heroes of The Storm - https://heroesofthestorm.com/
-{"name":"HeroesOfTheStor", "type":"game"}
-
-# Overwatch - https://playoverwatch.com/
-{"name":"Overwatch.exe", "type":"game"}
