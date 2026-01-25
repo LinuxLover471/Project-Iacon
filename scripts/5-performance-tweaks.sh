@@ -30,6 +30,8 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
   fi
   echo "Enabling PAT for better performance on Pentium III and newer CPUs, and enabling Preserve video memory after suspend."
   sudo cp "${dir}"/config/nvidia.conf /etc/modprobe.d/nvidia.conf
+  echo "Enabling the services that are required to use Preserve memory after suspend."
+  sudo systemctl enable nvidia-suspend nvidia-hibernate nvidia-resume
 
 else
   # Bootloader parameters.
