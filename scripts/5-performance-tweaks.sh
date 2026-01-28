@@ -59,19 +59,21 @@ fi
 ### Beginning of EXT4 Tweaks. ###
 if [[ ${ext4_tweaks} == "y" ]]; then
   # Modify the old fstab.
-  # Comment out the root (/) line to make sure the rw options in the bootloader kernel parameters work.
   echo "Adding # before root partition to ensure kernel parameters have any effect."
   sudo sed -i '/\s\/\s/s/^/#/' /etc/fstab
 
-  # Modify /home mount options
   echo "Adding parameters for home partition."
   sudo sed -i '/\s\/home\s/s|ext4\s\+\S\+|ext4\t\trw,defaults,commit=20,relatime|' /etc/fstab
 
   # EXT4 Tweaks.
   echo "Appling EXT4-specific tweaks."
-  echo "Enabling fast_commit."
-  sudo tune2fs -O fast_commit ${root_dev}
-  sudo tune2fs -O fast_commit ${home_dev}
+  if [[ ${ext4_fast_commit} == "y" ]]; then
+    echo "Enabling fast_commit."
+    sudo tune2fs -O fast_commit ${root_dev}
+    sudo tune2fs -O fast_commit ${home_dev}
+  else
+    echo "Skipping fast_commit."
+  fi
 
   # Bootloader steps.
   if [[ ${bootloader} == "grub" ]]; then

@@ -2,6 +2,8 @@
 
 **Project Iacon** is a set of Bash scripts designed to streamline post-installation setup and configuration for Arch Linux users. It automates essential tasks and applies performance and latency tweaks from the [Arch Wiki](https://wiki.archlinux.org), aiming to provide a faster and more consistent setup experience with minimal user intervention.
 
+WARNING: The fast_commit option for ext4 can be dangerous and cause corruption and require an fsck in the case of a powercut see: https://bbs.archlinux.org/viewtopic.php?id=311780
+
 ---
 
 ## ✨ Features

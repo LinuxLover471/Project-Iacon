@@ -122,6 +122,7 @@ while true; do
   echo
   if [[ -z ${perf_tweaks} || ${perf_tweaks} == "y" ]]; then
     echo "The script will apply performance tweaks..."
+
     # Which bootloader in use?
     select bootloader_choice in "Grub" "Syslinux"; do
       case ${bootloader_choice} in
@@ -140,12 +141,29 @@ while true; do
         ;;
       esac
     done
+
     # Apply EXT4-specific tweaks?
     while true; do
       read -n1 -rp "Do you want to apply EXT4-specific performance tweaks? [Y/n] :" ext4_tweaks
       ext4_tweaks="${ext4_tweaks,,}"
+      echo
       if [[ -z ${ext4_tweaks} || ${ext4_tweaks} == "y" ]]; then
         echo "EXT4-specific tweaks will be applied."
+        while true; do
+          echo "Fast commit is a feature that can cause system corruption and require a fsck in the case of a powercut. See README for link to a BBS thread that exhibits this issue."
+          read -n1 -rp "Do you want to enable Fast commit? [Y/n] :" ext4_fast_commit
+          ext4_fast_commit="${ext4_fast_commit,,}"
+          echo
+          if [[ -z ${ext4_fast_commit} || ${ext4_fast_commit} == "y" ]]; then
+            echo "Fast commit will be enabled."
+            break
+          elif [[ ${ext4_fast_commit} == "n" ]]; then
+            echo "Fast commit will *NOT* be enabled."
+            break
+          else
+            echo "Please provide a valid input."
+          fi
+        done
         break
       elif [[ ${ext4_tweaks} == "n" ]]; then
         echo "EXT4-specific tweaks will be skipped."
@@ -155,6 +173,7 @@ while true; do
       fi
     done
     break
+
   elif [[ ${perf_tweaks} == "n" ]]; then
     echo "The script will NOT apply performance tweaks..."
     break
@@ -244,7 +263,7 @@ done
 
 # Exporting variables for child scripts to use.
 
-export dir vulkansupport gpu_drv gpu_pkg nvidia_version bootloader ext4_tweaks de_type kdetype de_pkg
+export dir vulkansupport gpu_drv gpu_pkg nvidia_version bootloader ext4_tweaks ext4_fast_commit de_type kdetype de_pkg
 
 ################ Start of the actual installation. #################
 
