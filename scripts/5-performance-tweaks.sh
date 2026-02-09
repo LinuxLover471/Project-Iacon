@@ -28,10 +28,16 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
   else
     echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
+
   echo "Enabling PAT for better performance on Pentium III and newer CPUs, and enabling Preserve video memory after suspend."
   sudo cp "${dir}"/config/nvidia.conf /etc/modprobe.d/nvidia.conf
   echo "Enabling the services that are required to use Preserve memory after suspend."
   sudo systemctl enable nvidia-suspend nvidia-hibernate nvidia-resume
+
+  echo "Editing mkinitcpio to change HOOKS..."
+  sudo sed -i \
+    -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode keyboard sd-vconsole block filesystems fsck)/' \
+    /etc/mkinitcpio.conf
 
 else
   # Bootloader parameters.
@@ -49,14 +55,22 @@ else
   else
     echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
-  # Mkinitcpio tweaks for AMD and Intel.
-  echo "Copying mkinitcpio for faster boot times."
-  sudo cp "${dir}"/config/mkinitcpio-other-gpu.conf /etc/mkinitcpio.conf
-  echo "Updating initramfs."
-  sudo mkinitcpio -P
+  sudo sed -i \
+    -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode kms keyboard sd-vconsole block filesystems fsck)/' \
+    /etc/mkinitcpio.conf
 fi
 
-### Beginning of EXT4 Tweaks. ###
+### Mkinitcpio ###
+echo "Editing mkinitcpio to use zstd and faster compression and decompression."
+sudo sed -i \
+  -e 's/^#COMPRESSION="zstd"/COMPRESSION="zstd"/' \
+  -e 's/^#COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(--auto-threads=logical)/' \
+  /etc/mkinitcpio.conf
+
+echo "Updating mkinitcipo."
+sudo mkinitcpio -P
+
+### EXT4 Tweaks. ###
 if [[ ${ext4_tweaks} == "y" ]]; then
   # Modify the old fstab.
   echo "Adding # before root partition to ensure kernel parameters have any effect."
@@ -105,10 +119,25 @@ else
   sudo sed -i '/\sswap\s/s|swap\s\+\S\+|swap\t\tdefaults,discard|' /etc/fstab
 fi
 
-echo "Copying optimizations of makepkg."
-sudo cp "${dir}"/config/rust.conf /etc/makepkg.conf.d/rust.conf
-sudo cp "${dir}"/config/makepkg.conf /etc/makepkg.conf
+### Makepkg ###
+echo "Applying optimizations for makepkg and rust builds."
 
+sudo sed -i \
+  '/^RUSTFLAGS.*/ s/"$/ -C target-cpu=native -C link-arg=-z -C link-arg=pack-relative-relocs -C link-arg=-fuse-ld=mold"/' \
+  /etc/makepkg.conf.d/rust.conf
+
+sudo sed -i \
+  -e '/^CFLAGS=.*/ s|-march=x86-64 -mtune=generic|-march=native|' \
+  -e '/^[[:space:]]*-Wl,-z,pack-relative-relocs.*/ s/"/ -fuse-ld=mold"/' \
+  -e 's/^#MAKEFLAGS.*/MAKEFLAGS="--jobs=$(nproc)"/' \
+  -e '/^BUILDENV=.*/ s/!ccache/ccache/' \
+  -e '/^OPTIONS=.*/ s/!debug/debug/' \
+  -e '/^COMPRESSZST=.*/ s/-)$/--auto-threads=logical -)/' \
+  -e "s/^PKGEXT=.*/PKGEXT='.pkg.tar.zst'/" \
+  -e "s/^SRCEXT=.*/SRCEXT='.src.tar.zst'/" \
+  /etc/makepkg.conf
+
+### Configs & Service enables ###
 echo "Copying I/O Scheduler rules."
 sudo cp "${dir}"/config/60-ioschedulers.rules /etc/udev/rules.d/60-ioschedulers.rules
 

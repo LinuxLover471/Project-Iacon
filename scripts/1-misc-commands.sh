@@ -20,7 +20,7 @@ sudo timedatectl set-ntp true
 
 echo "Setting up cpupower for to set schedutil governor as default."
 sudo systemctl enable cpupower
-sudo cp "${dir}"/config/cpupower /etc/default/cpupower
+sudo sed -i "s/^#GOVERNOR.*/GOVERNOR='schedutil'/" /etc/default/cpupower-service.conf
 
 echo "setting up nftables."
 sudo systemctl enable nftables

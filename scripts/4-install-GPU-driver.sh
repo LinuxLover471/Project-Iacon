@@ -18,8 +18,11 @@ function install_gpu_pkg() {
 
 if [[ ${gpu_drv} == "nvidia" ]]; then
   echo "Installing ${nvidia_version} driver and it's components."
-  echo "Copying mkinitcpio.conf to setup the driver."
-  sudo cp -v "${dir}"/config/mkinitcpio-nvidia.conf /etc/mkinitcpio.conf
+  echo "Adding nvidia modules to mkinitcpio.conf to setup the driver."
+  sudo sed -i \
+    -e "s/^MODULES.*/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" \
+    -e '/^HOOKS=.*/ s/ kms//' \
+    /etc/mkinitcpio.conf
   sudo pacman -S linux-firmware-nvidia # Install firmware to ensure driver works properly.
   if [[ ${nvidia_version} == "nvidia" ]]; then
     install_gpu_pkg
