@@ -30,6 +30,9 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
     install_gpu_pkg
   elif [[ ${nvidia_version} == "nvidia-dkms" ]]; then
     install_gpu_pkg
+  elif [[ ${nvidia_version} == "580xx" ]]; then
+    aur sync --noconfirm ${gpu_pkg}
+    install_gpu_pkg
   elif [[ ${nvidia_version} == "470xx" ]]; then
     aur sync --noconfirm ${gpu_pkg}
     install_gpu_pkg

@@ -60,31 +60,16 @@ while true; do
       elif [[ ${open_or_pro} == "n" ]]; then
         gpu_drv="nvidia"
         echo "Select the version of the nvidia driver."
-        select nvidia_version in "nvidia" "nvidia-open" "nvidia-dkms" "470xx" "390xx"; do
+        select nvidia_version in "nvidia" "nvidia-open" "nvidia-dkms" "580xx" "470xx" "390xx"; do
           case ${nvidia_version} in
-          "nvidia")
-            echo "Setting to install nvidia package as driver."
-            gpu_pkg="nvidia nvidia-utils nvidia-settings"
+          "nvidia" | "nvidia-open" | "nvidia-dkms")
+            echo "Setting to install ${nvidia_version} package as driver."
+            gpu_pkg="${nvidia_version} nvidia-utils nvidia-settings"
             break 2
             ;;
-          "nvidia-open")
-            echo "Setting to install nvidia-open package as driver."
-            gpu_pkg="nvidia-open nvidia-utils nvidia-settings"
-            break 2
-            ;;
-          "nvidia-dkms")
-            echo "Setting to install nvidia-dkms packages as driver."
-            gpu_pkg="nvidia-dkms nvidia-utils nvidia-settings"
-            break 2
-            ;;
-          "470xx")
-            echo "Setting to install 470xx package as driver."
-            gpu_pkg="nvidia-470xx-dkms nvidia-470xx-utils nvidia-470xx-settings"
-            break 2
-            ;;
-          "390xx")
-            echo "Setting to install 390xx package as driver."
-            gpu_pkg="nvidia-390xx-dkms nvidia-390xx-utils nvidia-390xx-settings"
+          "580xx" | "470xx" | "390xx")
+            echo "Setting to install ${nvidia_version} package as driver."
+            gpu_pkg="nvidia-${nvidia_version}-dkms nvidia-${nvidia_version}-utils nvidia-${nvidia_version}-settings"
             break 2
             ;;
           *)
@@ -124,16 +109,11 @@ while true; do
     echo "The script will apply performance tweaks..."
 
     # Which bootloader in use?
-    select bootloader_choice in "Grub" "Syslinux"; do
+    select bootloader_choice in "grub" "syslinux"; do
       case ${bootloader_choice} in
-      "Grub")
-        echo "Setting up to update grub configuration..."
-        bootloader="grub"
-        break
-        ;;
-      "Syslinux")
-        echo "Setting up to update syslinux configuration..."
-        bootloader="syslinux"
+      "grub" | "syslinux")
+        echo "Setting up to update ${bootloader_choice} configuration..."
+        bootloader="${bootloader_choice}"
         break
         ;;
       *)
