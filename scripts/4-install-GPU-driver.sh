@@ -23,23 +23,15 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
     -e "s/^MODULES.*/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" \
     -e '/^HOOKS=.*/ s/ kms//' \
     /etc/mkinitcpio.conf
-  sudo pacman -S linux-firmware-nvidia # Install firmware to ensure driver works properly.
-  if [[ ${nvidia_version} == "nvidia" ]]; then
-    install_gpu_pkg
-  elif [[ ${nvidia_version} == "nvidia-open" ]]; then
-    install_gpu_pkg
-  elif [[ ${nvidia_version} == "nvidia-dkms" ]]; then
-    install_gpu_pkg
-  elif [[ ${nvidia_version} == "580xx" ]]; then
+  case "${nvidia_version}" in
+  "nvidia" | "nvidia-open" | "nvidia-dkms")
+    install_gpu_pkg linux-firmware-nvidia
+    ;;
+  "580xx" | "470xx" | "390xx")
     aur sync --noconfirm ${gpu_pkg}
-    install_gpu_pkg
-  elif [[ ${nvidia_version} == "470xx" ]]; then
-    aur sync --noconfirm ${gpu_pkg}
-    install_gpu_pkg
-  elif [[ ${nvidia_version} == "390xx" ]]; then
-    aur sync --noconfirm ${gpu_pkg}
-    install_gpu_pkg
-  fi
+    install_gpu_pkg linux-firmware-nvidia
+    ;;
+  esac
   check_and_install_vulkan
 
 # Nouveau section.
