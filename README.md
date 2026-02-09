@@ -39,6 +39,7 @@ WARNING: The fast_commit option for ext4 can be dangerous and cause corruption a
 
 ```bash
 git clone --recursive https://github.com/linuxlover471/Project-Iacon.git
+git submodule update --remote --recursive
 cd Project-Iacon
 
 # Run the Prelude script as root
