@@ -12,6 +12,14 @@ kernel_parameters="zswap.enabled=1 zswap.max_pool_percent=35 zswap.compressor=lz
 # Backup fstab in case the system gets screwed.
 sudo cp /etc/fstab /etc/fstab.bak
 
+### Mkinitcpio ###
+echo "Editing mkinitcpio to use zstd and faster compression and decompression."
+sudo sed -i \
+  -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode kms keyboard sd-vconsole block filesystems fsck)/' \
+  -e 's/^#COMPRESSION="zstd"/COMPRESSION="zstd"/' \
+  -e 's/^#COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(--auto-threads=logical)/' \
+  /etc/mkinitcpio.conf
+
 ### Insert kernel parameters. ###
 if [[ ${gpu_drv} == "nvidia" ]]; then
   if [[ ${bootloader} == "grub" ]]; then
@@ -34,9 +42,9 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
   echo "Enabling the services that are required to use Preserve memory after suspend."
   sudo systemctl enable nvidia-suspend nvidia-hibernate nvidia-resume
 
-  echo "Editing mkinitcpio to change HOOKS..."
+  echo "Editing mkinitcpio to remove kms from HOOKS..."
   sudo sed -i \
-    -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode keyboard sd-vconsole block filesystems fsck)/' \
+    -e '/^HOOKS=.*/ s/ kms//' \
     /etc/mkinitcpio.conf
 
 else
@@ -55,18 +63,9 @@ else
   else
     echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
-  sudo sed -i \
-    -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode kms keyboard sd-vconsole block filesystems fsck)/' \
-    /etc/mkinitcpio.conf
 fi
 
-### Mkinitcpio ###
-echo "Editing mkinitcpio to use zstd and faster compression and decompression."
-sudo sed -i \
-  -e 's/^#COMPRESSION="zstd"/COMPRESSION="zstd"/' \
-  -e 's/^#COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(--auto-threads=logical)/' \
-  /etc/mkinitcpio.conf
-
+## Update Mkinitcpio ##
 echo "Updating mkinitcipo."
 sudo mkinitcpio -P
 
@@ -131,7 +130,7 @@ sudo sed -i \
   -e '/^[[:space:]]*-Wl,-z,pack-relative-relocs.*/ s/"/ -fuse-ld=mold"/' \
   -e 's/^#MAKEFLAGS.*/MAKEFLAGS="--jobs=$(nproc)"/' \
   -e '/^BUILDENV=.*/ s/!ccache/ccache/' \
-  -e '/^OPTIONS=.*/ s/!debug/debug/' \
+  -e '/^OPTIONS=.*/ s/debug/!debug/' \
   -e '/^COMPRESSZST=.*/ s/-)$/--auto-threads=logical -)/' \
   -e "s/^PKGEXT=.*/PKGEXT='.pkg.tar.zst'/" \
   -e "s/^SRCEXT=.*/SRCEXT='.src.tar.zst'/" \
