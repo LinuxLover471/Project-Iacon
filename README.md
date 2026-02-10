@@ -1,44 +1,42 @@
-# Project Iacon
+# Overview
 
-**Project Iacon** is a set of Bash scripts designed to streamline post-installation setup and configuration for Arch Linux users. It automates essential tasks and applies performance and latency tweaks from the [Arch Wiki](https://wiki.archlinux.org), aiming to provide a faster and more consistent setup experience with minimal user intervention.
+**Project-Iacon** is a repository of scripts designed to assist users setup their system post-manual installation from the [Arch Wiki](https://wiki.archlinux.org/title/Main_page), with many useful features.
 
-WARNING: The fast_commit option for ext4 can be dangerous and cause corruption and require an fsck in the case of a powercut see: https://bbs.archlinux.org/viewtopic.php?id=311780
+## Highlights
 
----
+Most options listed below can be disabled on the user's command.
 
-## ✨ Features
+- **Minimal Distraction**  
+  Everything is asked upfront to avoid interruptions mid-process
 
-- **Minimal Distraction Workflow**  
-  Prompts are clearly defined and asked upfront to avoid interruptions mid-process.
+- **GPU Driver & Vulkan Installation**  
+  Installs appropriate GPU driver and `Vulkan` support
 
-- **Automatic GPU Driver Installation**  
-  Detects and installs the appropriate GPU drivers based on your hardware.
+- **Various optimizations from the Arch Wiki**  
+  Applies several performance,latency and other optimizations from the [Arch Wiki](https://wiki.archlinux.org/title/Main_page)
+  **WARNING:** The fast_commit option for `ext4` can be dangerous and cause corruption and require an `fsck` in case of a powercut. See: [Arch Wiki: Ext4#Enabling_fast_commit](https://wiki.archlinux.org/title/Ext4#Enabling_fast_commit)
+- **DE Installation**  
+  Installs a DE of choice, with various options like KDE (Minimal, Meta, Full), Gnome, XFCE and i3 (Creator's configuration!)
 
-- **Arch Wiki-Based Performance Tweaks**  
-  Applies several proven system tweaks for performance, assuming:
-  - Your root (`/`) and home (`/home`) partitions are on `ext4`.
-  IF you don't have a root and /home partition as ext4, you can apply other safe tweaks.
+- **AUR helper installation [(aurutils)](https://github.com/aurutils/aurutils/)**  
+  [aurutils](https://github.com/aurutils/aurutils/), an [AUR helper](https://wiki.archlinux.org/title/AUR_helpers), is also installed and setup accordingly (Required for installing legacy dkms Nvidia drivers)
 
-- **Automatic User Creation**  
-  Adds a new user and sets up defaults to reduce post-install steps.
+- **Root-privilege User Creation**  
+  Creates a new root-privilege-user instead of using `root` for the Master script
 
 - **Graceful Error Handling**  
-  Handles invalid input and unexpected conditions without crashing.
+  Automatically handles invalid input rather than crashing
 
----
+## Requirements
 
-## 📦 Requirements
-
-- Arch Linux (base system)
+- Arch Linux
 - `bash`
-- `ext4` filesystem for `/` and `/home` (to enable all performance tweaks)
+- `ext4` filesystem on `/` and `/home` partitions for `ext4` optimizations
 
----
-
-## 🛠️ Usage
+## Usage
 
 ```bash
-git clone --recursive https://github.com/linuxlover471/Project-Iacon.git
+git clone --recursive https://github.com/asyync1024/Project-Iacon.git
 git submodule update --remote --recursive
 cd Project-Iacon
 
@@ -48,5 +46,5 @@ cd Project-Iacon
 # After user creation, switch to the new user
 su - newuser
 
-# Run the main setup script
+# Run the main setup script as new user.
 ./Master.sh
