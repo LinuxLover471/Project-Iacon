@@ -14,6 +14,7 @@ Most options listed below can be disabled on the user's command.
 
 - **Various optimizations from the Arch Wiki**  
   Applies several performance,latency and other optimizations from the [Arch Wiki](https://wiki.archlinux.org/title/Main_page)
+
   **WARNING:** The fast_commit option for `ext4` can be dangerous and cause corruption and require an `fsck` in case of a powercut. See: [Arch Wiki: Ext4#Enabling_fast_commit](https://wiki.archlinux.org/title/Ext4#Enabling_fast_commit)
 - **DE Installation**  
   Installs a DE of choice, with various options like KDE (Minimal, Meta, Full), Gnome, XFCE and i3 (Creator's configuration!)
