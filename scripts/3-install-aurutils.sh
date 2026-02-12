@@ -5,7 +5,7 @@ AUR_DIR="/var/cache/pacman/aurutils"
 
 echo "Copying aurutils repo with git clone."
 if [[ ! -d "${HOME}/aurutils" ]]; then
-  git clone https://aur.archlinux.org/aurutils.git "${HOME}/aurutils"
+    git clone https://aur.archlinux.org/aurutils.git "${HOME}/aurutils"
 fi
 
 echo "Entering aurutils directory."
@@ -30,14 +30,14 @@ Server = file://${AUR_DIR}
 EOF
 
 if ! grep -q 'Include = /etc/pacman.d/aurutils' /etc/pacman.conf; then
-  echo "Include = /etc/pacman.d/aurutils" | sudo tee -a /etc/pacman.conf
+    echo "Include = /etc/pacman.d/aurutils" | sudo tee -a /etc/pacman.conf
 fi
 
 sudo install -d ${AUR_DIR} -o ${USER}
 
 echo "Initializing empty repo database."
 if [[ ! -f "${AUR_DIR}/aurutils.db.tar" ]]; then
-  repo-add "${AUR_DIR}/aurutils.db.tar"
+    repo-add "${AUR_DIR}/aurutils.db.tar"
 fi
 
 echo "Synchronizing with pacman."
