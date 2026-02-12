@@ -13,12 +13,15 @@ kernel_parameters="zswap.enabled=1 zswap.max_pool_percent=35 zswap.compressor=lz
 sudo cp /etc/fstab /etc/fstab.bak
 
 ### Mkinitcpio ###
-echo "Editing mkinitcpio to use zstd and faster compression and decompression."
+echo "Editing mkinitcpio to use systemd HOOKS and faster compression and decompression for zstd."
 sudo sed -i \
-  -e 's/^HOOKS=.*/HOOKS=(systemd autodetect microcode kms keyboard sd-vconsole block filesystems fsck)/' \
+  -e '/^HOOKS=.*/ s/base udev/systemd/; s/keymap consolefont/sd-vconsole/' \
   -e 's/^#COMPRESSION="zstd"/COMPRESSION="zstd"/' \
   -e 's/^#COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(--auto-threads=logical)/' \
   /etc/mkinitcpio.conf
+
+echo "Updating mkinitcipo."
+sudo mkinitcpio -P
 
 ### Insert kernel parameters. ###
 if [[ ${gpu_drv} == "nvidia" ]]; then
@@ -42,11 +45,6 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
   echo "Enabling the services that are required to use Preserve memory after suspend."
   sudo systemctl enable nvidia-suspend nvidia-hibernate nvidia-resume
 
-  echo "Editing mkinitcpio to remove kms from HOOKS..."
-  sudo sed -i \
-    -e '/^HOOKS=.*/ s/ kms//' \
-    /etc/mkinitcpio.conf
-
 else
   # Bootloader parameters.
   if [[ ${bootloader} == "grub" ]]; then
@@ -64,10 +62,6 @@ else
     echo "Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
   fi
 fi
-
-## Update Mkinitcpio ##
-echo "Updating mkinitcipo."
-sudo mkinitcpio -P
 
 ### EXT4 Tweaks. ###
 if [[ ${ext4_tweaks} == "y" ]]; then
