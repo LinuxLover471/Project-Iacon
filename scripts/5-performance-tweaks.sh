@@ -15,9 +15,9 @@ sudo cp /etc/fstab /etc/fstab.bak
 ### Mkinitcpio ###
 echo "Editing mkinitcpio to use systemd HOOKS and faster compression and decompression for zstd."
 sudo sed -i \
-    -e '/^HOOKS=.*/ s/base udev/systemd/; s/keymap consolefont/sd-vconsole/' \
-    -e 's/^#COMPRESSION="zstd"/COMPRESSION="zstd"/' \
-    -e 's/^#COMPRESSION_OPTIONS=.*/COMPRESSION_OPTIONS=(--auto-threads=logical)/' \
+    -e '/^HOOKS=.*/ { s/base udev/systemd/; s/keymap consolefont/sd-vconsole/ }' \
+    -e '/^#COMPRESSION="zstd"/ s/#//' \
+    -e '/^#COMPRESSION_OPTIONS=.*/ { s/)$/ --auto-threads=logical)/; s/#// }' \
     /etc/mkinitcpio.conf
 
 echo "Updating mkinitcipo."
@@ -120,7 +120,7 @@ sudo sed -i \
     /etc/makepkg.conf.d/rust.conf
 
 sudo sed -i \
-    -e '/^CFLAGS=.*/ s|-march=x86-64 -mtune=generic|-march=native|' \
+    -e '/^CFLAGS=.*/ s/-march=x86-64 -mtune=generic/-march=native/' \
     -e '/^[[:space:]]*-Wl,-z,pack-relative-relocs.*/ s/"/ -fuse-ld=mold"/' \
     -e 's/^#MAKEFLAGS.*/MAKEFLAGS="--jobs=$(nproc)"/' \
     -e '/^BUILDENV=.*/ s/!ccache/ccache/' \

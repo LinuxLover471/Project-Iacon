@@ -20,7 +20,7 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
     echo "Installing ${nvidia_version} driver and it's components."
     echo "Adding nvidia modules to mkinitcpio.conf to setup the driver."
     sudo sed -i \
-        -e "s/^MODULES.*/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" \
+        -e "/^MODULES.*/ s/)$/ nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" \
         -e '/^HOOKS=.*/ s/ kms//' \
         /etc/mkinitcpio.conf
     case "${nvidia_version}" in
