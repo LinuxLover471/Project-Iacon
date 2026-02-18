@@ -131,13 +131,13 @@ while true; do
                 echo "EXT4-specific tweaks will be applied."
                 while true; do
                     echo "Fast commit is a feature that can cause system corruption and require a fsck in the case of a powercut. See README for link to a BBS thread that exhibits this issue."
-                    read -n1 -rp "Do you want to enable Fast commit? [Y/n] :" ext4_fast_commit
+                    read -n1 -rp "Do you want to enable Fast commit? [y/N] :" ext4_fast_commit
                     ext4_fast_commit="${ext4_fast_commit,,}"
                     echo
-                    if [[ -z ${ext4_fast_commit} || ${ext4_fast_commit} == "y" ]]; then
+                    if [[ ${ext4_fast_commit} == "y" ]]; then
                         echo "Fast commit will be enabled."
                         break
-                    elif [[ ${ext4_fast_commit} == "n" ]]; then
+                    elif [[ -z ${ext4_fast_commit} || ${ext4_fast_commit} == "n" ]]; then
                         echo "Fast commit will *NOT* be enabled."
                         break
                     else
@@ -249,12 +249,22 @@ export dir vulkansupport gpu_drv gpu_pkg nvidia_version bootloader ext4_tweaks e
 
 cd "${dir}"/scripts/ #Enter the source directory to make sure the scripts are executed properly and less chance of failure.
 
+# Performance tweaks section.
+
+if [[ -z ${perf_tweaks} || ${perf_tweaks} == "y" ]]; then
+    echo "Initiating application of arch wiki tweaks."
+    sudo pacman -S --noconfirm --needed mold # Needed for makepkg.conf optimization.
+    ./3-performance-tweaks.sh
+else
+    echo "Skipping tweaks."
+fi
+
 # AUR helper, trizen installation procedure.
 
 if [[ -z ${aur_choice} || ${aur_choice} == "y" ]]; then
     echo "Installation of aurutils begins..."
     sudo pacman -S --noconfirm --needed vifm # Default pager for aurutils.
-    ./3-install-aurutils.sh
+    ./4-install-aurutils.sh
 else
     echo "Not installing aurutils."
 fi
@@ -265,19 +275,9 @@ cd "${dir}"/scripts/ # Getting back to the scripts directory as it got messed up
 
 if [[ -z ${gpu_choice} || ${gpu_choice} == "y" ]]; then
     echo "Starting GPU installation."
-    ./4-install-GPU-driver.sh
+    ./5-install-GPU-driver.sh
 else
     echo "Skipping driver installation procedure."
-fi
-
-# Performance tweaks section.
-
-if [[ -z ${perf_tweaks} || ${perf_tweaks} == "y" ]]; then
-    echo "Initiating application of arch wiki tweaks."
-    sudo pacman -S --noconfirm --needed mold # Needed for makepkg.conf optimization.
-    ./5-performance-tweaks.sh
-else
-    echo "Skipping tweaks."
 fi
 
 # DE Installation section.

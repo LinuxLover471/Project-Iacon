@@ -3,21 +3,21 @@
 set -euo pipefail
 AUR_DIR="/var/cache/pacman/aurutils"
 
-echo "Copying aurutils repo with git clone."
+echo "==> Copying aurutils repo with git clone."
 if [[ ! -d "${HOME}/aurutils" ]]; then
     git clone https://aur.archlinux.org/aurutils.git "${HOME}/aurutils"
 fi
 
-echo "Entering aurutils directory."
+echo "==> Entering aurutils directory."
 cd "${HOME}/aurutils"
 
-echo "Making the package using makepkg"
+echo "==> Making the package using makepkg"
 makepkg -si --noconfirm
 
-echo "Creating the directory where the aurutils cache will lie."
+echo "==> Creating the directory where the aurutils cache will lie."
 sudo mkdir -p "${AUR_DIR}"
 
-echo "Creating a local repository."
+echo "==> Creating a local repository."
 sudo tee /etc/pacman.d/aurutils >/dev/null <<EOF
 [options]
 CacheDir = /var/cache/pacman/pkg
@@ -35,13 +35,13 @@ fi
 
 sudo install -d ${AUR_DIR} -o ${USER}
 
-echo "Initializing empty repo database."
+echo "==> Initializing empty repo database."
 if [[ ! -f "${AUR_DIR}/aurutils.db.tar" ]]; then
     repo-add "${AUR_DIR}/aurutils.db.tar"
 fi
 
-echo "Synchronizing with pacman."
+echo "==> Synchronizing with pacman."
 sudo pacman -Syu
 
-echo "aurutils was installed successfully."
+echo "==> aurutils was installed successfully."
 exit 0

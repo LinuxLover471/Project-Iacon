@@ -18,17 +18,17 @@ else
     su -c "pacman -S --needed sudo"
 fi
 
-echo "Enabling Color+ILoveCandy! Because everyone deserves some color and eye candy in their package manager!"
+echo "==> Enabling Color+ILoveCandy! Because everyone deserves some color and eye candy in their package manager!"
 sudo sed -i \
     -e '/^#Color/s/^#//' \
     -e '/^Color$/a ILoveCandy' \
     /etc/pacman.conf
 
-echo "Forcing a mirror refresh and making sure the system is up to date."
+echo "==> Forcing a mirror refresh and making sure the system is up to date."
 sudo pacman -Syyu
 
-echo "Installing packages."
+echo "==> Installing packages."
 sudo pacman -S --needed --noconfirm nftables alsa-utils base-devel git cpupower ccache ${ananicycpporgamemode} ${linux_header}
 
-echo "Important packages installed successfully."
+echo "==> Important packages installed successfully."
 exit 0

@@ -7,6 +7,7 @@ dir="$(pwd)"
 
 echo "Hello, this is the prelude part of the master script."
 echo "This script is made to assist users in installing and setting up their system with the arch wiki performance tweaks."
+echo
 
 # Asking which kernel version the user is using to make sure the right headers are used.
 
@@ -31,6 +32,7 @@ fi
 if [[ -n ${linux_header} ]]; then
     echo "Detected kernel headers package: ${linux_header}"
     read -p "Do you want to install this package? It is required when installing a DKMS variant of the NVIDIA driver. (Y/n): " choice
+    echo
     if [[ "${choice}" =~ ^[Nn] ]]; then
         linux_header=""
     fi
@@ -65,7 +67,7 @@ done
 # Asking about the username and asking about creating a new user.
 
 while true; do
-    read -n1 -rp "Do you want to create a new (w/root privileges) user? (Required for non-root access for trizen and aur.) [Y/n]" user_choice
+    read -n1 -rp "Do you want to create a new (w/root privileges) user? (Required for installing Nvidia dkms drivers.) [Y/n]" user_choice
     user_choice="${user_choice,,}"
     echo
     if [[ -z ${user_choice} || ${user_choice} == "y" ]]; then
@@ -95,14 +97,15 @@ cd "${dir}"/scripts/ #Enter the source directory to make sure the scripts are ex
 
 echo "Installing the important pacman packages."
 ./0-pacman-packages.sh
-echo "Starting essential commands."
-./1-misc-commands.sh
 
 if [[ -z ${user_choice} || ${user_choice} == "y" ]]; then
     echo "Creating a new user."
-    ./2-user-creation.sh
+    ./1-user-creation.sh
 else
     echo "Not creating a new user, you probably already have a new user."
 fi
+
+echo "Starting essential commands."
+./2-misc-commands.sh
 
 exit 0
