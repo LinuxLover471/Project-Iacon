@@ -24,14 +24,14 @@ sudo sed -i \
 if [[ ${gpu_drv} == "nvidia" ]]; then
     if [[ ${bootloader} == "grub" ]]; then
         echo "==> Updating GRUB config."
-        sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="nvidia_drm.modeset=1 ${kernel_parameters}"/' /etc/default/grub
+        sudo sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"nvidia_drm.modeset=1 ${kernel_parameters}\"/" /etc/default/grub
         sudo grub-mkconfig -o /boot/grub/grub.cfg
 
     elif [[ ${bootloader} == "syslinux" ]]; then
         echo "==> Adding syslinux parameters."
-        sudo sed -i '/^LABEL arch/,/^LABEL / {
+        sudo sed -i "/^LABEL arch/,/^LABEL / {
         /^[[:space:]]*APPEND / s/$/ nvidia_drm.modeset=1 ${kernel_parameters}/
-        }' /boot/syslinux/syslinux.cfg
+        }" /boot/syslinux/syslinux.cfg
 
     else
         echo "==> Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
@@ -44,14 +44,14 @@ else
     # Bootloader parameters.
     if [[ ${bootloader} == "grub" ]]; then
         echo "==> Updating GRUB config."
-        sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="${kernel_parameters}"/' /etc/default/grub
+        sudo sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"${kernel_parameters}\"/" /etc/default/grub
         sudo grub-mkconfig -o /boot/grub/grub.cfg
 
     elif [[ ${bootloader} == "syslinux" ]]; then
         echo "==> Adding syslinux parameters."
-        sudo sed -i '/^LABEL arch/,/^LABEL / {
+        sudo sed -i "/^LABEL arch/,/^LABEL / {
       /^[[:space:]]*APPEND / s/$/ ${kernel_parameters}/
-  }' /boot/syslinux/syslinux.cfg
+  }" /boot/syslinux/syslinux.cfg
 
     else
         echo "==> Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
@@ -83,14 +83,14 @@ if [[ ${ext4_tweaks} == "y" ]]; then
     # Bootloader steps.
     if [[ ${bootloader} == "grub" ]]; then
         echo "==> Adding rootflags in grub."
-        sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="rootflags=rw,defaults,commit=20,noatime"/' /etc/default/grub
+        sudo sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"rootflags=rw,defaults,commit=20,noatime\"/" /etc/default/grub
         sudo grub-mkconfig -o /boot/grub/grub.cfg
 
     elif [[ ${bootloader} == "syslinux" ]]; then
         echo "==> Adding rootflags in syslinux."
-        sudo sed -i '/^LABEL arch/,/^LABEL / {
+        sudo sed -i "/^LABEL arch/,/^LABEL / {
       /^[[:space:]]*APPEND / s/$/ rootflags=rw,defaults,commit=20,noatime/
-  }' /boot/syslinux/syslinux.cfg
+  }" /boot/syslinux/syslinux.cfg
 
     else
         echo "==> Unknown bootloader: ${bootloader}. Skipping bootloader-specific steps."
@@ -121,8 +121,8 @@ sudo sed -i \
     -e '/^CFLAGS=.*/ s/-march=x86-64 -mtune=generic/-march=native/' \
     -e '/^[[:space:]]*-Wl,-z,pack-relative-relocs.*/ s/"/ -fuse-ld=mold"/' \
     -e 's/^#MAKEFLAGS.*/MAKEFLAGS="--jobs=$(nproc)"/' \
-    -e '/^BUILDENV=.*/ s/!ccache/ccache/' \
-    -e '/^OPTIONS=.*/ s/debug/!debug/' \
+    -e '/^BUILDENV=.*/ s/ !ccache/ ccache/' \
+    -e '/^OPTIONS=.*/ s/ debug/ !debug/' \
     -e '/^COMPRESSZST=.*/ s/-)$/--auto-threads=logical -)/' \
     -e "s/^PKGEXT=.*/PKGEXT='.pkg.tar.zst'/" \
     -e "s/^SRCEXT=.*/SRCEXT='.src.tar.zst'/" \

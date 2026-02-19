@@ -208,7 +208,7 @@ while true; do
                 ;;
             "i3")
                 echo "Setting to install i3... more personalised for the creator."
-                de_pkg="i3 polybar picom dunst rofi rofi-calc ly numlockx xorg-xrdb xorg-xauth lutris alacritty nnn neovim xsel feh thunar polkit-gnome gvfs gvfs-mtp ark thunar-archive-plugin tumbler redshift inter-font ttf-fira-code ttf-firacode-nerd noto-fonts-emoji"
+                de_pkg="i3 polybar picom dunst rofi rofi-calc ly numlockx xorg-xrdb xorg-xauth alacritty nnn neovim xsel pacman-contrib namcap feh thunar polkit-gnome gvfs gvfs-mtp ark thunar-archive-plugin tumbler redshift inter-font ttf-fira-code ttf-firacode-nerd noto-fonts-emoji"
                 break 2
                 ;;
             *)

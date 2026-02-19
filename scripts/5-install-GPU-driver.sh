@@ -28,6 +28,7 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
         install_gpu_pkg linux-firmware-nvidia
         ;;
     "580xx" | "470xx" | "390xx")
+	rm -rf ${HOME}/.cache/aurutils/sync/
         aur sync --noconfirm ${gpu_pkg}
         install_gpu_pkg linux-firmware-nvidia
         ;;
