@@ -40,6 +40,12 @@ if [[ ! -f "${AUR_DIR}/aurutils.db.tar" ]]; then
     repo-add "${AUR_DIR}/aurutils.db.tar"
 fi
 
+echo "==> Installing aurutils package to aurutils repo."
+if ! compgen -G "${AUR_DIR}/aurutils-*.pkg.tar.*" >/dev/null; then
+    mv aurutils-*.pkg.tar.* ${AUR_DIR}
+    repo-add -n "${AUR_DIR}/aurutils.db.tar" "${AUR_DIR}/aurutils-*.pkg.tar.*"
+fi
+
 echo "==> Synchronizing with pacman."
 sudo pacman -Syu
 
