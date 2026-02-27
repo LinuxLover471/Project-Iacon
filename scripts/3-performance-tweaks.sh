@@ -17,7 +17,7 @@ echo "==> Editing mkinitcpio to use systemd HOOKS and faster compression and dec
 sudo sed -i \
     -e '/^HOOKS=.*/ { s/base //; s/ keymap//; s/ consolefont//; s/ sd-vconsole//; s/ block/ sd-vconsole block/ }' \
     -e '/^#COMPRESSION="zstd"/ s/#//' \
-    -e '/^#COMPRESSION_OPTIONS=.*/ { s/)$/ --auto-threads=logical)/; s/#// }' \
+    -e '/^#COMPRESSION_OPTIONS=.*/ { s/)$/ --auto-threads=logical)/; s/( /(/; s/#// }' \
     /etc/mkinitcpio.conf
 
 ### Insert kernel parameters. ###
