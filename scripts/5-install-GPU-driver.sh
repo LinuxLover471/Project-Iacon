@@ -22,23 +22,28 @@ if [[ ${gpu_drv} == "nvidia" ]]; then
     sudo sed -i \
         -e "/^MODULES.*/ s/)$/ nvidia nvidia_modeset nvidia_uvm nvidia_drm)/" \
         -e '/^HOOKS=.*/ s/ kms//' \
+        -e "/^MODULES.*/ s/( /(/" \
         /etc/mkinitcpio.conf
     case "${nvidia_version}" in
-    "nvidia" | "nvidia-open" | "nvidia-dkms")
-        install_gpu_pkg linux-firmware-nvidia
-        ;;
     "580xx" | "470xx" | "390xx")
-	rm -rf ${HOME}/.cache/aurutils/sync/
+        rm -rf "${HOME}/.cache/aurutils/*/nvidia-${nvidia_version}-*"
         aur sync --noconfirm ${gpu_pkg}
-        install_gpu_pkg linux-firmware-nvidia
         ;;
     esac
+    install_gpu_pkg linux-firmware-nvidia
     check_and_install_vulkan
 
     echo "==> Enabling PAT and Preserve Memory after suspend."
     sudo cp "${dir}"/config/nvidia.conf /etc/modprobe.d/nvidia.conf
     echo "==> Enabling services required for Preserve Memory after suspend."
-    sudo systemctl enable nvidia-suspend nvidia-hibernate nvidia-resume
+    sudo systemctl enable nvidia-suspend nvidia-hibernate
+    if [[ ${de_type} == "Gnome" ]]; then
+        echo "==> Using nvidia-resume service as it's required for Gnome, Wayland."
+        sudo systemctl enable nvidia-resume
+    fi
+
+    echo "==> Refreshing mkinitcpio to apply nvidia PAT and Preserve VRAM after suspend."
+    sudo mkinitcpio -P
 
 # Nouveau section.
 
